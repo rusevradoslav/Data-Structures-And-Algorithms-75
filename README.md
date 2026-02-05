@@ -953,6 +953,166 @@ return result;
 
 ---
 
+## Stack
+
+### Quick Reference
+
+| # | Problem | Difficulty | Time | Space | Pattern |
+|---|---------|------------|------|-------|---------|
+| 1 | [Removing Stars From a String](#1-removing-stars-from-a-string) | Medium | O(n) | O(n) | [Stack (LIFO)](#stack-lifo) |
+| 2 | [Asteroid Collision](#2-asteroid-collision) | Medium | O(n) | O(n) | [Stack (Collision Resolution)](#stack-lifo) |
+| 3 | [Decode String](#3-decode-string) | Medium | O(n) | O(n) | [Stack (Nested Encoding)](#stack-lifo) |
+
+---
+
+### 1. Removing Stars From a String
+
+**Approach:** Use a stack. Push letters; when a `*` appears, pop the most recent letter. Rebuild the string in left-to-right order.
+
+**Time Complexity:** O(n) — each character is pushed and popped at most once.
+
+**Space Complexity:** O(n) — stack stores remaining characters.
+
+**Pattern:** [Stack (LIFO)](#stack-lifo) — last inserted character is removed first.
+
+**Key Insight:** Each star only removes the closest non-star character to its left, which is exactly the most recent one.
+
+**Code:**
+```java
+Deque<Character> stack = new ArrayDeque<>();
+for (char ch : s.toCharArray()) {
+    if (ch == '*') {
+        stack.pop();
+    } else {
+        stack.push(ch);
+    }
+}
+
+StringBuilder result = new StringBuilder();
+while (!stack.isEmpty()) {
+    result.append(stack.removeLast());
+}
+return result.toString();
+```
+
+---
+
+### 2. Asteroid Collision
+
+**Approach:** Keep a stack of surviving asteroids. When a left-moving asteroid meets a right-moving top, resolve collisions by popping smaller ones; equal sizes remove both.
+
+**Time Complexity:** O(n) — each asteroid is pushed and popped at most once.
+
+**Space Complexity:** O(n) — stack of survivors.
+
+**Pattern:** [Stack (Collision Resolution)](#stack-lifo) — only the latest right-moving asteroid can collide with the current left-moving one.
+
+**Key Insight:** Collisions only occur at the boundary between a right-moving asteroid already on the stack and a left-moving incoming asteroid.
+
+**Code:**
+```java
+Deque<Integer> stack = new ArrayDeque<>();
+for (int a : asteroids) {
+    boolean alive = true;
+    while (alive && a < 0 && !stack.isEmpty() && stack.peekLast() > 0) {
+        int top = stack.peekLast();
+        if (top < -a) {
+            stack.pollLast();
+            continue;
+        }
+        if (top == -a) {
+            stack.pollLast();
+        }
+        alive = false;
+    }
+    if (alive) {
+        stack.add(a);
+    }
+}
+```
+
+---
+
+### 3. Decode String
+
+**Approach:** Use two stacks: one for repeat counts and one for partial strings. On `[`, push current state; on `]`, pop and expand the substring.
+
+**Time Complexity:** O(n) — each character is processed once in the stack solution.
+
+**Space Complexity:** O(n) — stacks hold counts and partial strings.
+
+**Pattern:** [Stack (Nested Encoding)](#stack-lifo) — decode innermost brackets first.
+
+**Key Insight:** Bracket nesting naturally follows a last-in-first-out order.
+
+**Code:**
+```java
+Deque<Integer> countStack = new ArrayDeque<>();
+Deque<StringBuilder> stringStack = new ArrayDeque<>();
+StringBuilder current = new StringBuilder();
+int count = 0;
+
+for (char c : s.toCharArray()) {
+    if (Character.isDigit(c)) {
+        count = count * 10 + (c - '0');
+    } else if (c == '[') {
+        countStack.push(count);
+        stringStack.push(current);
+        count = 0;
+        current = new StringBuilder();
+    } else if (c == ']') {
+        int repeat = countStack.pop();
+        StringBuilder prev = stringStack.pop();
+        prev.append(current.toString().repeat(repeat));
+        current = prev;
+    } else {
+        current.append(c);
+    }
+}
+return current.toString();
+```
+
+---
+
+## Queue
+
+### Quick Reference
+
+| # | Problem | Difficulty | Time | Space | Pattern |
+|---|---------|------------|------|-------|---------|
+| 1 | [Number of Recent Calls](#1-number-of-recent-calls) | Easy | O(1)* | O(n) | [Queue (FIFO)](#queue-fifo) |
+
+*\* O(1) amortized — each timestamp is enqueued and dequeued at most once*
+
+---
+
+### 1. Number of Recent Calls
+
+**Approach:** Maintain a FIFO queue of timestamps. On each ping, enqueue the new timestamp, then dequeue all timestamps older than `t - 3000`. The queue size is the answer.
+
+**Time Complexity:** O(1) amortized — each timestamp is enqueued and dequeued at most once.
+
+**Space Complexity:** O(n) — where n is the number of pings in the current 3000ms window.
+
+**Pattern:** [Queue (FIFO)](#queue-fifo) — expired timestamps are always at the front, so a simple while loop removes them.
+
+**Key Insight:** Since `t` is strictly increasing, the queue is always sorted. Expired elements are always at the front, making this a natural fit for a queue rather than a stack or sorted structure.
+
+**Code:**
+```java
+private final Deque<Integer> queue = new ArrayDeque<>();
+
+public int ping(int t) {
+    queue.offer(t);
+    while (!queue.isEmpty() && queue.peek() < t - 3000) {
+        queue.poll();
+    }
+    return queue.size();
+}
+```
+
+---
+
 ## Key Patterns
 
 ### Two Pointers
@@ -1184,6 +1344,42 @@ for (String part : parts) {
     // transform and append
 }
 return result.toString();
+```
+
+---
+
+### Stack (LIFO)
+
+**When to use:** Problems where the most recent element must be removed first (undo, nested structures, collision resolution).
+
+**How it works:** Push items as they come in, and pop when they are resolved. The last item added is the first removed.
+
+**Template:**
+```java
+Deque<Integer> stack = new ArrayDeque<>();
+stack.push(1);
+stack.push(2);
+
+int top = stack.peek(); // 2
+stack.pop();            // removes 2
+```
+
+---
+
+### Queue (FIFO)
+
+**When to use:** Problems where the oldest element must be removed first (time windows, BFS, scheduling).
+
+**How it works:** Add items to the back, remove from the front. The first item added is the first removed — ideal for expiring old entries in order.
+
+**Template:**
+```java
+Deque<Integer> queue = new ArrayDeque<>();
+queue.offer(1);   // add to back
+queue.offer(2);
+
+int front = queue.peek(); // 1
+queue.poll();              // removes 1
 ```
 
 ---
