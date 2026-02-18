@@ -1074,6 +1074,82 @@ return current.toString();
 
 ---
 
+## Queue
+
+### Quick Reference
+
+| # | Problem | Difficulty | Time | Space | Pattern |
+|---|---------|------------|------|-------|---------|
+| 1 | [Number of Recent Calls](#1-number-of-recent-calls) | Easy | O(1)* | O(n) | [Queue (FIFO)](#queue-fifo) |
+| 2 | [Dota2 Senate](#2-dota2-senate) | Medium | O(n) | O(n) | [Two Queues with Indices](#queue-fifo) |
+
+*\* O(1) amortized — each timestamp is enqueued and dequeued at most once*
+
+---
+
+### 1. Number of Recent Calls
+
+**Approach:** Maintain a FIFO queue of timestamps. On each ping, enqueue the new timestamp, then dequeue all timestamps older than `t - 3000`. The queue size is the answer.
+
+**Time Complexity:** O(1) amortized — each timestamp is enqueued and dequeued at most once.
+
+**Space Complexity:** O(n) — where n is the number of pings in the current 3000ms window.
+
+**Pattern:** [Queue (FIFO)](#queue-fifo) — expired timestamps are always at the front, so a simple while loop removes them.
+
+**Key Insight:** Since `t` is strictly increasing, the queue is always sorted. Expired elements are always at the front, making this a natural fit for a queue rather than a stack or sorted structure.
+
+**Code:**
+```java
+private final Deque<Integer> queue = new ArrayDeque<>();
+
+public int ping(int t) {
+    queue.offer(t);
+    while (!queue.isEmpty() && queue.peek() < t - 3000) {
+        queue.poll();
+    }
+    return queue.size();
+}
+```
+
+---
+
+### 2. Dota2 Senate
+
+**Approach:** Use two queues storing senator indices — one for Radiant, one for Dire. Compare the fronts: the lower index acts first and bans the other. The winner re-enters their queue with `index + n` to represent the next round. Repeat until one queue is empty.
+
+**Time Complexity:** O(n) — each senator is processed at most twice. Each comparison is O(1).
+
+**Space Complexity:** O(n) — both queues together hold all n senators.
+
+**Pattern:** [Queue (FIFO)](#queue-fifo) — two queues simulate the circular left-to-right voting order.
+
+**Key Insight:** The `+ n` offset elegantly handles circular rounds. A senator at index 0 who survives round 1 becomes index `n`, correctly placing them after all round-1 opponents. No need to re-scan the string.
+
+**Code:**
+```java
+ArrayDeque<Integer> radiantQueue = new ArrayDeque<>();
+ArrayDeque<Integer> direQueue = new ArrayDeque<>();
+
+char[] chars = senate.toCharArray();
+int n = chars.length;
+for (int i = 0; i < n; i++) {
+    if (chars[i] == 'R') radiantQueue.offer(i);
+    else direQueue.offer(i);
+}
+
+while (!radiantQueue.isEmpty() && !direQueue.isEmpty()) {
+    int r = radiantQueue.poll();
+    int d = direQueue.poll();
+    if (r < d) radiantQueue.offer(r + n);
+    else direQueue.offer(d + n);
+}
+
+return radiantQueue.isEmpty() ? "Dire" : "Radiant";
+```
+
+---
+
 ## Key Patterns
 
 ### Two Pointers
@@ -1323,6 +1399,24 @@ stack.push(2);
 
 int top = stack.peek(); // 2
 stack.pop();            // removes 2
+```
+
+---
+
+### Queue (FIFO)
+
+**When to use:** Problems where the oldest element must be removed first (time windows, BFS, scheduling).
+
+**How it works:** Add items to the back, remove from the front. The first item added is the first removed — ideal for expiring old entries in order.
+
+**Template:**
+```java
+Deque<Integer> queue = new ArrayDeque<>();
+queue.offer(1);   // add to back
+queue.offer(2);
+
+int front = queue.peek(); // 1
+queue.poll();              // removes 1
 ```
 
 ---
