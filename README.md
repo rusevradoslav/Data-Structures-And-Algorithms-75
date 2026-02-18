@@ -1150,6 +1150,51 @@ return radiantQueue.isEmpty() ? "Dire" : "Radiant";
 
 ---
 
+## Linked List
+
+### Quick Reference
+
+| # | Problem | Difficulty | Time | Space | Pattern |
+|---|---------|------------|------|-------|---------|
+| 1 | [Delete the Middle Node of a Linked List](#1-delete-the-middle-node-of-a-linked-list) | Medium | O(n) | O(1) | [Two-Pass Count and Walk](#two-pass-count-and-walk) |
+
+---
+
+### 1. Delete the Middle Node of a Linked List
+
+**Approach:** Two-pass — first traverse the list to count nodes, then walk to the node before the middle and skip over it by rewiring `prev.next = prev.next.next`.
+
+**Time Complexity:** O(n) — two passes through the list.
+
+**Space Complexity:** O(1) — only a few pointer variables.
+
+**Pattern:** [Two-Pass Count and Walk](#two-pass-count-and-walk) — first pass gathers size, second pass acts on a specific position.
+
+**Key Insight:** We only need the node *before* the middle to perform the deletion. Walking `midIndex - 1` steps from the head lands exactly on that node.
+
+**Code:**
+```java
+if (head.next == null) return null;
+
+int counter = 1;
+ListNode node = head;
+while (node.next != null) {
+    node = node.next;
+    counter++;
+}
+int midIndex = counter / 2;
+
+ListNode prev = head;
+for (int i = 0; i < midIndex - 1; i++) {
+    prev = prev.next;
+}
+prev.next = prev.next.next;
+
+return head;
+```
+
+---
+
 ## Key Patterns
 
 ### Two Pointers
