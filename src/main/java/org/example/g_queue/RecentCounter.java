@@ -14,7 +14,7 @@ import java.util.TreeSet;
  * <p>Approach:
  * <ul>
  *   <li>Maintain a FIFO queue of timestamps</li>
- *   <li>On each ping, add the new timestamp, then evict all timestamps older than {@code t - 3000}</li>
+ *   <li>On each ping, evict all timestamps older than {@code t - 3000}, then add the new timestamp</li>
  *   <li>The queue size is the answer</li>
  * </ul>
  *
@@ -42,10 +42,10 @@ class RecentCounter {
     }
 
     public int ping(int t) {
-        queue.offer(t);
         while (!queue.isEmpty() && queue.peek() < t - 3000) {
             queue.poll();
         }
+        queue.offer(t);
         return queue.size();
     }
 }
