@@ -1081,6 +1081,7 @@ return current.toString();
 | # | Problem | Difficulty | Time | Space | Pattern |
 |---|---------|------------|------|-------|---------|
 | 1 | [Number of Recent Calls](#1-number-of-recent-calls) | Easy | O(1)* | O(n) | [Queue (FIFO)](#queue-fifo) |
+| 2 | [Dota2 Senate](#2-dota2-senate) | Medium | O(n) | O(n) | [Two Queues with Indices](#queue-fifo) |
 
 *\* O(1) amortized — each timestamp is enqueued and dequeued at most once*
 
@@ -1109,6 +1110,42 @@ public int ping(int t) {
     }
     return queue.size();
 }
+```
+
+---
+
+### 2. Dota2 Senate
+
+**Approach:** Use two queues storing senator indices — one for Radiant, one for Dire. Compare the fronts: the lower index acts first and bans the other. The winner re-enters their queue with `index + n` to represent the next round. Repeat until one queue is empty.
+
+**Time Complexity:** O(n) — each senator is processed at most twice. Each comparison is O(1).
+
+**Space Complexity:** O(n) — both queues together hold all n senators.
+
+**Pattern:** [Queue (FIFO)](#queue-fifo) — two queues simulate the circular left-to-right voting order.
+
+**Key Insight:** The `+ n` offset elegantly handles circular rounds. A senator at index 0 who survives round 1 becomes index `n`, correctly placing them after all round-1 opponents. No need to re-scan the string.
+
+**Code:**
+```java
+ArrayDeque<Integer> radiantQueue = new ArrayDeque<>();
+ArrayDeque<Integer> direQueue = new ArrayDeque<>();
+
+char[] chars = senate.toCharArray();
+int n = chars.length;
+for (int i = 0; i < n; i++) {
+    if (chars[i] == 'R') radiantQueue.offer(i);
+    else direQueue.offer(i);
+}
+
+while (!radiantQueue.isEmpty() && !direQueue.isEmpty()) {
+    int r = radiantQueue.poll();
+    int d = direQueue.poll();
+    if (r < d) radiantQueue.offer(r + n);
+    else direQueue.offer(d + n);
+}
+
+return radiantQueue.isEmpty() ? "Dire" : "Radiant";
 ```
 
 ---
