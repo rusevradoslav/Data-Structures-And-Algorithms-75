@@ -82,6 +82,13 @@ class OddEvenLinkedListTest {
         assertListEquals(List.of(1, 3, 5, -2, -4), solution.oddEvenList(head));
     }
 
+    @Test
+    @DisplayName("Test with one node")
+    void oneNode() {
+        ListNode head = buildList(1);
+        assertListEquals(List.of(1), solution.oddEvenList(head));
+    }
+
     private ListNode buildList(int... values) {
         ListNode dummy = new ListNode(0);
         ListNode current = dummy;
