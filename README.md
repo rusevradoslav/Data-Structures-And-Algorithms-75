@@ -1157,6 +1157,7 @@ return radiantQueue.isEmpty() ? "Dire" : "Radiant";
 | # | Problem | Difficulty | Time | Space | Pattern |
 |---|---------|------------|------|-------|---------|
 | 1 | [Delete the Middle Node of a Linked List](#1-delete-the-middle-node-of-a-linked-list) | Medium | O(n) | O(1) | [Two-Pass Count and Walk](#two-pass-count-and-walk) |
+| 2 | [Odd Even Linked List](#2-odd-even-linked-list) | Medium | O(n) | O(1) | [Two Pointers (Odd/Even Chains)](#two-pointers) |
 
 ---
 
@@ -1190,6 +1191,40 @@ for (int i = 0; i < midIndex - 1; i++) {
 }
 prev.next = prev.next.next;
 
+return head;
+```
+
+---
+
+### 2. Odd Even Linked List
+
+**Approach:** Use two pointers — `odd` walks odd-indexed nodes, `even` walks even-indexed nodes. Save `evenHead` before the loop. In each iteration, rewire `odd.next` and `even.next` to skip alternating nodes. After the loop, connect the chains with `odd.next = evenHead`.
+
+**Time Complexity:** O(n) — single pass through the list.
+
+**Space Complexity:** O(1) — only three pointer variables, no extra data structures.
+
+**Pattern:** [Two Pointers (Odd/Even Chains)](#two-pointers) — split the list into two interleaved chains, then reconnect.
+
+**Key Insight:** Saving `evenHead` before the loop is essential — without it, we lose the reference to the start of the even chain after rewiring pointers.
+
+**Code:**
+```java
+if (head == null || head.next == null) return head;
+
+ListNode odd = head;
+ListNode even = head.next;
+ListNode evenHead = even;
+
+while (even != null && even.next != null) {
+    odd.next = even.next;
+    odd = odd.next;
+
+    even.next = odd.next;
+    even = even.next;
+}
+
+odd.next = evenHead;
 return head;
 ```
 
