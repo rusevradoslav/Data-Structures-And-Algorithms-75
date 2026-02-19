@@ -1158,6 +1158,9 @@ return radiantQueue.isEmpty() ? "Dire" : "Radiant";
 |---|---------|------------|------|-------|---------|
 | 1 | [Delete the Middle Node of a Linked List](#1-delete-the-middle-node-of-a-linked-list) | Medium | O(n) | O(1) | [Two-Pass Count and Walk](#two-pass-count-and-walk) |
 | 2 | [Odd Even Linked List](#2-odd-even-linked-list) | Medium | O(n) | O(1) | [Two Pointers (Odd/Even Chains)](#two-pointers) |
+| 3 | [Reverse Linked List](#3-reverse-linked-list) | Easy | O(n) | O(1)* | [Pointer Reversal](#pointer-reversal) |
+
+*\* O(1) for optimised solution, O(n) for deque solution*
 
 ---
 
@@ -1226,6 +1229,56 @@ while (even != null && even.next != null) {
 
 odd.next = evenHead;
 return head;
+```
+
+---
+
+### 3. Reverse Linked List
+
+**Approach 1 (Deque):** Push all values onto a deque with front insertion (reverses order). Second pass overwrites each node's value by polling from the deque.
+
+**Approach 2 (Pointer Reversal — Optimised):** Maintain three pointers: `prev`, `curr`, `next`. At each step, save `next`, flip `curr.next` to point backwards, then advance both pointers. When `curr` reaches null, `prev` is the new head.
+
+**Time Complexity:** O(n) — each node visited once (or twice for deque approach).
+
+**Space Complexity:** O(n) for deque, O(1) for pointer reversal.
+
+**Pattern:** [Pointer Reversal](#pointer-reversal) — flip each link direction one node at a time.
+
+**Key Insight:** You must save `curr.next` before overwriting it — otherwise you lose the reference to the rest of the list.
+
+**Code (Deque):**
+```java
+ArrayDeque<Integer> deque = new ArrayDeque<>();
+
+ListNode curr = head;
+while (curr != null) {
+    deque.offerFirst(curr.val);
+    curr = curr.next;
+}
+
+curr = head;
+while (curr != null) {
+    curr.val = deque.poll();
+    curr = curr.next;
+}
+
+return head;
+```
+
+**Code (Optimised):**
+```java
+ListNode prev = null;
+ListNode curr = head;
+
+while (curr != null) {
+    ListNode next = curr.next;
+    curr.next = prev;
+    prev = curr;
+    curr = next;
+}
+
+return prev;
 ```
 
 ---
