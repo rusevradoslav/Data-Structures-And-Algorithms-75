@@ -1159,6 +1159,7 @@ return radiantQueue.isEmpty() ? "Dire" : "Radiant";
 | 1 | [Delete the Middle Node of a Linked List](#1-delete-the-middle-node-of-a-linked-list) | Medium | O(n) | O(1) | [Two-Pass Count and Walk](#two-pass-count-and-walk) |
 | 2 | [Odd Even Linked List](#2-odd-even-linked-list) | Medium | O(n) | O(1) | [Two Pointers (Odd/Even Chains)](#two-pointers) |
 | 3 | [Reverse Linked List](#3-reverse-linked-list) | Easy | O(n) | O(1)* | [Pointer Reversal](#pointer-reversal) |
+| 4 | [Maximum Twin Sum of a Linked List](#4-maximum-twin-sum-of-a-linked-list) | Medium | O(n) | O(n)* | [Deque (Both Ends)](#deque-both-ends) |
 
 *\* O(1) for optimised solution, O(n) for deque solution*
 
@@ -1279,6 +1280,39 @@ while (curr != null) {
 }
 
 return prev;
+```
+
+---
+
+### 4. Maximum Twin Sum of a Linked List
+
+**Approach:** Load all node values into a deque. Then simultaneously remove from both ends, computing the twin sum at each step and tracking the maximum.
+
+**Time Complexity:** O(n) — each node visited once.
+
+**Space Complexity:** O(n) for the deque approach, O(1) for the optimised slow/fast + reverse approach.
+
+**Pattern:** [Deque (Both Ends)](#deque-both-ends) — use a double-ended queue to pair first/last elements efficiently.
+
+**Key Insight:** Twin pairs are symmetric — node `i` pairs with node `n-1-i`. A deque lets you consume from both ends simultaneously. For O(1) space, use slow/fast pointers to find the middle, reverse the second half, then walk both halves.
+
+**Code (Deque):**
+```java
+ArrayDeque<Integer> deque = new ArrayDeque<>();
+ListNode temp = head;
+while (temp != null) {
+    deque.addLast(temp.val);
+    temp = temp.next;
+}
+
+int midIndex = deque.size() / 2;
+int maxSum = 0;
+for (int i = 0; i < midIndex; i++) {
+    int fValue = deque.removeFirst();
+    int sValue = deque.removeLast();
+    maxSum = Math.max(maxSum, fValue + sValue);
+}
+return maxSum;
 ```
 
 ---
@@ -1550,6 +1584,30 @@ queue.offer(2);
 
 int front = queue.peek(); // 1
 queue.poll();              // removes 1
+```
+
+---
+
+### Deque (Both Ends)
+
+**When to use:** Problems where you need to pair elements from opposite ends of a sequence — first with last, second with second-to-last, etc.
+
+**How it works:** Load elements into a deque, then simultaneously remove from both ends. This naturally pairs symmetric positions without needing index calculations.
+
+**Template:**
+```java
+Deque<Integer> deque = new ArrayDeque<>();
+// load all elements
+for (int val : values) {
+    deque.addLast(val);
+}
+
+// pair from both ends
+while (deque.size() > 1) {
+    int first = deque.removeFirst();
+    int last = deque.removeLast();
+    // process pair (first, last)
+}
 ```
 
 ---
