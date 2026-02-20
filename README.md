@@ -1150,6 +1150,173 @@ return radiantQueue.isEmpty() ? "Dire" : "Radiant";
 
 ---
 
+## Linked List
+
+### Quick Reference
+
+| # | Problem | Difficulty | Time | Space | Pattern |
+|---|---------|------------|------|-------|---------|
+| 1 | [Delete the Middle Node of a Linked List](#1-delete-the-middle-node-of-a-linked-list) | Medium | O(n) | O(1) | [Two-Pass Count and Walk](#two-pass-count-and-walk) |
+| 2 | [Odd Even Linked List](#2-odd-even-linked-list) | Medium | O(n) | O(1) | [Two Pointers (Odd/Even Chains)](#two-pointers) |
+| 3 | [Reverse Linked List](#3-reverse-linked-list) | Easy | O(n) | O(1)* | [Pointer Reversal](#pointer-reversal) |
+| 4 | [Maximum Twin Sum of a Linked List](#4-maximum-twin-sum-of-a-linked-list) | Medium | O(n) | O(n)* | [Deque (Both Ends)](#deque-both-ends) |
+
+*\* O(1) for optimised solution, O(n) for deque solution*
+
+---
+
+### 1. Delete the Middle Node of a Linked List
+
+**Approach:** Two-pass — first traverse the list to count nodes, then walk to the node before the middle and skip over it by rewiring `prev.next = prev.next.next`.
+
+**Time Complexity:** O(n) — two passes through the list.
+
+**Space Complexity:** O(1) — only a few pointer variables.
+
+**Pattern:** [Two-Pass Count and Walk](#two-pass-count-and-walk) — first pass gathers size, second pass acts on a specific position.
+
+**Key Insight:** We only need the node *before* the middle to perform the deletion. Walking `midIndex - 1` steps from the head lands exactly on that node.
+
+**Code:**
+```java
+if (head.next == null) return null;
+
+int counter = 1;
+ListNode node = head;
+while (node.next != null) {
+    node = node.next;
+    counter++;
+}
+int midIndex = counter / 2;
+
+ListNode prev = head;
+for (int i = 0; i < midIndex - 1; i++) {
+    prev = prev.next;
+}
+prev.next = prev.next.next;
+
+return head;
+```
+
+---
+
+### 2. Odd Even Linked List
+
+**Approach:** Use two pointers — `odd` walks odd-indexed nodes, `even` walks even-indexed nodes. Save `evenHead` before the loop. In each iteration, rewire `odd.next` and `even.next` to skip alternating nodes. After the loop, connect the chains with `odd.next = evenHead`.
+
+**Time Complexity:** O(n) — single pass through the list.
+
+**Space Complexity:** O(1) — only three pointer variables, no extra data structures.
+
+**Pattern:** [Two Pointers (Odd/Even Chains)](#two-pointers) — split the list into two interleaved chains, then reconnect.
+
+**Key Insight:** Saving `evenHead` before the loop is essential — without it, we lose the reference to the start of the even chain after rewiring pointers.
+
+**Code:**
+```java
+if (head == null || head.next == null) return head;
+
+ListNode odd = head;
+ListNode even = head.next;
+ListNode evenHead = even;
+
+while (even != null && even.next != null) {
+    odd.next = even.next;
+    odd = odd.next;
+
+    even.next = odd.next;
+    even = even.next;
+}
+
+odd.next = evenHead;
+return head;
+```
+
+---
+
+### 3. Reverse Linked List
+
+**Approach 1 (Deque):** Push all values onto a deque with front insertion (reverses order). Second pass overwrites each node's value by polling from the deque.
+
+**Approach 2 (Pointer Reversal — Optimised):** Maintain three pointers: `prev`, `curr`, `next`. At each step, save `next`, flip `curr.next` to point backwards, then advance both pointers. When `curr` reaches null, `prev` is the new head.
+
+**Time Complexity:** O(n) — each node visited once (or twice for deque approach).
+
+**Space Complexity:** O(n) for deque, O(1) for pointer reversal.
+
+**Pattern:** [Pointer Reversal](#pointer-reversal) — flip each link direction one node at a time.
+
+**Key Insight:** You must save `curr.next` before overwriting it — otherwise you lose the reference to the rest of the list.
+
+**Code (Deque):**
+```java
+ArrayDeque<Integer> deque = new ArrayDeque<>();
+
+ListNode curr = head;
+while (curr != null) {
+    deque.offerFirst(curr.val);
+    curr = curr.next;
+}
+
+curr = head;
+while (curr != null) {
+    curr.val = deque.poll();
+    curr = curr.next;
+}
+
+return head;
+```
+
+**Code (Optimised):**
+```java
+ListNode prev = null;
+ListNode curr = head;
+
+while (curr != null) {
+    ListNode next = curr.next;
+    curr.next = prev;
+    prev = curr;
+    curr = next;
+}
+
+return prev;
+```
+
+---
+
+### 4. Maximum Twin Sum of a Linked List
+
+**Approach:** Load all node values into a deque. Then simultaneously remove from both ends, computing the twin sum at each step and tracking the maximum.
+
+**Time Complexity:** O(n) — each node visited once.
+
+**Space Complexity:** O(n) for the deque approach, O(1) for the optimised slow/fast + reverse approach.
+
+**Pattern:** [Deque (Both Ends)](#deque-both-ends) — use a double-ended queue to pair first/last elements efficiently.
+
+**Key Insight:** Twin pairs are symmetric — node `i` pairs with node `n-1-i`. A deque lets you consume from both ends simultaneously. For O(1) space, use slow/fast pointers to find the middle, reverse the second half, then walk both halves.
+
+**Code (Deque):**
+```java
+ArrayDeque<Integer> deque = new ArrayDeque<>();
+ListNode temp = head;
+while (temp != null) {
+    deque.addLast(temp.val);
+    temp = temp.next;
+}
+
+int midIndex = deque.size() / 2;
+int maxSum = 0;
+for (int i = 0; i < midIndex; i++) {
+    int fValue = deque.removeFirst();
+    int sValue = deque.removeLast();
+    maxSum = Math.max(maxSum, fValue + sValue);
+}
+return maxSum;
+```
+
+---
+
 ## Key Patterns
 
 ### Two Pointers
@@ -1417,6 +1584,30 @@ queue.offer(2);
 
 int front = queue.peek(); // 1
 queue.poll();              // removes 1
+```
+
+---
+
+### Deque (Both Ends)
+
+**When to use:** Problems where you need to pair elements from opposite ends of a sequence — first with last, second with second-to-last, etc.
+
+**How it works:** Load elements into a deque, then simultaneously remove from both ends. This naturally pairs symmetric positions without needing index calculations.
+
+**Template:**
+```java
+Deque<Integer> deque = new ArrayDeque<>();
+// load all elements
+for (int val : values) {
+    deque.addLast(val);
+}
+
+// pair from both ends
+while (deque.size() > 1) {
+    int first = deque.removeFirst();
+    int last = deque.removeLast();
+    // process pair (first, last)
+}
 ```
 
 ---
