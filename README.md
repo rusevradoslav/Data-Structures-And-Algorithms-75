@@ -1154,12 +1154,12 @@ return radiantQueue.isEmpty() ? "Dire" : "Radiant";
 
 ### Quick Reference
 
-| # | Problem | Difficulty | Time | Space | Pattern |
-|---|---------|------------|------|-------|---------|
+| # | Problem | Difficulty | Time | Space | Pattern                                             |
+|---|---------|------------|------|-------|-----------------------------------------------------|
 | 1 | [Delete the Middle Node of a Linked List](#1-delete-the-middle-node-of-a-linked-list) | Medium | O(n) | O(1) | [Two-Pass Count and Walk](#two-pass-count-and-walk) |
-| 2 | [Odd Even Linked List](#2-odd-even-linked-list) | Medium | O(n) | O(1) | [Two Pointers (Odd/Even Chains)](#two-pointers) |
-| 3 | [Reverse Linked List](#3-reverse-linked-list) | Easy | O(n) | O(1)* | [Pointer Reversal](#pointer-reversal) |
-| 4 | [Maximum Twin Sum of a Linked List](#4-maximum-twin-sum-of-a-linked-list) | Medium | O(n) | O(n)* | [Deque (Both Ends)](#deque-both-ends) |
+| 2 | [Odd Even Linked List](#2-odd-even-linked-list) | Medium | O(n) | O(1) | [Odd/Even Chain Split](#oddeven-chain-split)        |
+| 3 | [Reverse Linked List](#3-reverse-linked-list) | Easy | O(n) | O(1)* | [Pointer Reversal](#pointer-reversal)               |
+| 4 | [Maximum Twin Sum of a Linked List](#4-maximum-twin-sum-of-a-linked-list) | Medium | O(n) | O(n)* | [Deque (Both Ends)](#deque-both-ends)               |
 
 *\* O(1) for optimised solution, O(n) for deque solution*
 
@@ -1208,7 +1208,7 @@ return head;
 
 **Space Complexity:** O(1) — only three pointer variables, no extra data structures.
 
-**Pattern:** [Two Pointers (Odd/Even Chains)](#two-pointers) — split the list into two interleaved chains, then reconnect.
+**Pattern:** [Odd/Even Chain Split](#oddeven-chain-split) — split the list into two interleaved chains, then reconnect.
 
 **Key Insight:** Saving `evenHead` before the loop is essential — without it, we lose the reference to the start of the even chain after rewiring pointers.
 
@@ -1321,11 +1321,11 @@ return maxSum;
 
 ### Two Pointers
 
-**When to use:** Problems involving pairs, comparing elements from different positions, traversing from both ends, or splitting a linked list into interleaved chains.
+**When to use:** Problems involving pairs, comparing elements from different positions, or traversing from both ends.
 
 **How it works:** Maintain two pointers that move based on conditions — either toward each other, or in the same direction at different speeds.
 
-**Template (Array — Opposite Ends):**
+**Template:**
 ```java
 int left = 0, right = arr.length - 1;
 while (left < right) {
@@ -1341,7 +1341,15 @@ while (left < right) {
 }
 ```
 
-**Template (Linked List — Odd/Even Chain Split):**
+---
+
+### Odd/Even Chain Split
+
+**When to use:** Linked list problems where you need to split nodes into two interleaved chains based on position (odd/even indices) and reconnect them.
+
+**How it works:** Use two pointers — one walks odd-indexed nodes, the other walks even-indexed nodes. Save the even chain head before rewiring. After the loop, connect the odd chain tail to the even chain head.
+
+**Template:**
 ```java
 ListNode odd = head;
 ListNode even = head.next;
