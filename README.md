@@ -1321,11 +1321,11 @@ return maxSum;
 
 ### Two Pointers
 
-**When to use:** Problems involving pairs, comparing elements from different positions, or traversing from both ends.
+**When to use:** Problems involving pairs, comparing elements from different positions, traversing from both ends, or splitting a linked list into interleaved chains.
 
 **How it works:** Maintain two pointers that move based on conditions — either toward each other, or in the same direction at different speeds.
 
-**Template:**
+**Template (Array — Opposite Ends):**
 ```java
 int left = 0, right = arr.length - 1;
 while (left < right) {
@@ -1341,15 +1341,33 @@ while (left < right) {
 }
 ```
 
+**Template (Linked List — Odd/Even Chain Split):**
+```java
+ListNode odd = head;
+ListNode even = head.next;
+ListNode evenHead = even; // save before rewiring
+
+while (even != null && even.next != null) {
+    odd.next = even.next;   // link odd to next odd
+    odd = odd.next;
+
+    even.next = odd.next;   // link even to next even
+    even = even.next;
+}
+
+odd.next = evenHead; // reconnect chains
+return head;
+```
+
 ---
 
 ### Slow/Fast Pointers
 
-**When to use:** In-place array modifications, finding subsequences, or cycle detection.
+**When to use:** In-place array modifications, finding subsequences, cycle detection, or finding the middle of a linked list.
 
 **How it works:** Slow pointer marks a position (placement or match), fast pointer scans ahead. They move at different rates based on conditions.
 
-**Template:**
+**Template (Array):**
 ```java
 int slow = 0, fast = 0;
 while (fast < arr.length) {
@@ -1359,6 +1377,17 @@ while (fast < arr.length) {
     }
     fast++;
 }
+```
+
+**Template (Linked List — Find Middle):**
+```java
+ListNode slow = head, fast = head;
+while (fast.next != null && fast.next.next != null) {
+    slow = slow.next;       // 1 step
+    fast = fast.next.next;  // 2 steps
+}
+// slow is now at the end of the first half
+// slow.next is the start of the second half
 ```
 
 ---
@@ -1608,6 +1637,57 @@ while (deque.size() > 1) {
     int last = deque.removeLast();
     // process pair (first, last)
 }
+```
+
+---
+
+### Two-Pass Count and Walk
+
+**When to use:** Linked list problems where you need a node at a specific position but don't know the list length (e.g., delete the middle node, find the k-th node from end).
+
+**How it works:** First pass traverses the entire list to count nodes. Second pass walks to the target position using the count.
+
+**Template:**
+```java
+// Pass 1: count nodes
+int count = 0;
+ListNode node = head;
+while (node != null) {
+    node = node.next;
+    count++;
+}
+
+// Pass 2: walk to target
+int target = count / 2; // e.g., middle
+ListNode prev = head;
+for (int i = 0; i < target - 1; i++) {
+    prev = prev.next;
+}
+// prev is now the node before the target
+prev.next = prev.next.next; // skip target
+```
+
+---
+
+### Pointer Reversal
+
+**When to use:** Reversing a linked list (fully or partially), or problems that require traversing a list backwards without extra space.
+
+**How it works:** Maintain three pointers: `prev`, `curr`, `next`. At each step, save `curr.next`, flip `curr.next` to point backwards, then advance both pointers. When done, `prev` is the new head.
+
+**Template:**
+```java
+ListNode prev = null;
+ListNode curr = head;
+
+while (curr != null) {
+    ListNode next = curr.next; // save next
+    curr.next = prev;          // flip pointer
+    prev = curr;               // advance prev
+    curr = next;               // advance curr
+}
+
+return prev; // new head
 ```
 
 ---
