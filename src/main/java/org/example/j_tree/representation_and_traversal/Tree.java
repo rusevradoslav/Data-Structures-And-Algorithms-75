@@ -1,4 +1,4 @@
-package org.example.j_tree;
+package org.example.j_tree.representation_and_traversal;
 
 
 import java.util.ArrayDeque;
@@ -7,11 +7,62 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Generic n-ary tree backed by parent pointers and an adjacency list of children.
+ *
+ * <p>Each node stores a value, a reference to its parent (or {@code null} for the root),
+ * and an ordered list of child nodes. This representation supports an arbitrary number
+ * of children per node.
+ *
+ * <p><b>Traversals:</b>
+ * <ul>
+ *   <li>{@link #orderBfs()} — breadth-first using an {@code ArrayDeque} as a queue</li>
+ *   <li>{@link #preorderDfs()} — recursive depth-first, parent visited before children</li>
+ *   <li>{@link #postorderDfs()} — recursive depth-first, children visited before parent</li>
+ * </ul>
+ *
+ * <p><b>Mutations:</b>
+ * <ul>
+ *   <li>{@link #addChild(Object, Tree)} — locate a parent by key (DFS) and append a subtree</li>
+ *   <li>{@link #removeNode(Object)} — detach a node from its parent and nullify it</li>
+ *   <li>{@link #swap(Object, Object)} — swap two nodes handling three cases:
+ *       root swap, parent-child swap, and general (sibling) swap</li>
+ * </ul>
+ *
+ * <p>Example:
+ * <pre>
+ *          7
+ *        / | \
+ *      19  21  14
+ *     /|\      /\
+ *    1 12 31  23  6
+ *
+ * BFS:      [7, 19, 21, 14, 1, 12, 31, 23, 6]
+ * Preorder: [7, 19, 1, 12, 31, 21, 14, 23, 6]
+ * Postorder:[1, 12, 31, 19, 21, 23, 6, 14, 7]
+ * </pre>
+ *
+ * <p>Time Complexity: O(n) for all traversals, addChild, removeNode, and swap
+ * (each requires a DFS lookup by key).
+ *
+ * <p>Space Complexity: O(n) for BFS (queue), O(h) for DFS (recursion stack,
+ * where h is the height of the tree).
+ *
+ * @param <E> the type of value stored in each tree node
+ */
 public class Tree<E> implements AbstractTree<E> {
     private E value;
     private Tree<E> parent;
     private List<Tree<E>> children;
 
+    /**
+     * Creates a tree node with the given value and optional children.
+     *
+     * <p>Each child's parent reference is set to this node automatically.
+     *
+     * @param value    the value stored in this node
+     * @param children zero or more child subtrees to attach
+     */
     @SafeVarargs
     public Tree(E value, Tree<E>... children) {
         this.value = value;
@@ -23,6 +74,12 @@ public class Tree<E> implements AbstractTree<E> {
     }
 
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>Uses an {@link ArrayDeque} as a FIFO queue, polling one node at a time
+     * and enqueuing all its children.
+     */
     @Override
     public List<E> orderBfs() {
         List<E> result = new ArrayList<>();
@@ -40,6 +97,11 @@ public class Tree<E> implements AbstractTree<E> {
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>Recursively visits all children before recording the current node's value.
+     */
     @Override
     public List<E> postorderDfs() {
         List<E> result = new ArrayList<>();
@@ -54,6 +116,11 @@ public class Tree<E> implements AbstractTree<E> {
         result.add(tree.value);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>Records the current node's value first, then recursively visits each child.
+     */
     @Override
     public List<E> preorderDfs() {
         List<E> result = new ArrayList<>();
@@ -69,6 +136,12 @@ public class Tree<E> implements AbstractTree<E> {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>Performs a DFS lookup for the parent, then appends the child and
+     * sets its parent reference.
+     */
     @Override
     public void addChild(E parentKey, Tree<E> child) {
         Tree<E> parentNode = findNodeByKey(parentKey, this);
@@ -79,6 +152,12 @@ public class Tree<E> implements AbstractTree<E> {
         parentNode.children.add(child);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>Detaches the node from its parent's children list, clears its own
+     * children, and nullifies its value.
+     */
     @Override
     public void removeNode(E nodeKey) {
         Tree<E> node = findNodeByKey(nodeKey, this);
@@ -91,6 +170,19 @@ public class Tree<E> implements AbstractTree<E> {
         node.value = null;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>Three cases are handled:
+     * <ol>
+     *   <li><b>Root swap</b> — if either node is the root, copy the other node's
+     *       value and children into the root</li>
+     *   <li><b>Parent-child swap</b> — transfers children between the two nodes
+     *       and fixes all parent references to avoid circular links</li>
+     *   <li><b>General swap</b> — replaces each node in its parent's children list
+     *       with the other node and updates parent pointers</li>
+     * </ol>
+     */
     @Override
     public void swap(E firstKey, E secondKey) {
         Tree<E> firstNode = findNodeByKey(firstKey, this);

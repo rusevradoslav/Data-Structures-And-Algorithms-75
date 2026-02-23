@@ -1,4 +1,4 @@
-package org.example.j_tree;
+package org.example.j_tree.representation_and_traversal;
 
 
 import org.junit.jupiter.api.BeforeEach;
