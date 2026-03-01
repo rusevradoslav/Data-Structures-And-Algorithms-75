@@ -1,4 +1,4 @@
-package org.example.j_tree.representation_and_traversal;
+package org.example.j_tree.n_tree_representation_and_traversal;
 
 import java.util.List;
 
