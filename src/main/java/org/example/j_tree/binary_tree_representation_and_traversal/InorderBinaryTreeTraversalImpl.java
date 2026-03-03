@@ -98,22 +98,18 @@ public class InorderBinaryTreeTraversalImpl<E> implements BinaryTreeTraversal<E>
         }
 
         List<E> result = new ArrayList<>();
-
         Deque<BinaryTreeNode<E>> stack = new ArrayDeque<>();
-        stack.push(node);
-
         BinaryTreeNode<E> current = node;
-        while (!stack.isEmpty()) {
-            while (Objects.nonNull(current.left)) {
-                stack.push(current.left);
+
+        while (current != null || !stack.isEmpty()) {
+            while (current != null) {
+                stack.push(current);
                 current = current.left;
             }
-            BinaryTreeNode<E> tempNode = stack.pop();
-            result.add(tempNode.val);
 
-            if (Objects.nonNull(tempNode.right)) {
-                stack.push(tempNode.right);
-            }
+            current = stack.pop();
+            result.add(current.val);
+            current = current.right;
         }
 
         return result;
