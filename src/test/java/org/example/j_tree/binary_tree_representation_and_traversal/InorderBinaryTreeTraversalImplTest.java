@@ -82,4 +82,17 @@ public class InorderBinaryTreeTraversalImplTest {
         assertEquals(List.of(10, 15, 20), inorder.recursive(skewed));
         assertEquals(List.of(10, 15, 20), inorder.iterative(skewed));
     }
+
+    @Test
+    @DisplayName("Tree with right subtree having left child: [1, 3, 5, 6, 8]")
+    public void testRightSubtreeWithLeftChild() {
+        BinaryTreeNode<Integer> node = new BinaryTreeNode<>(5);
+        node.left = new BinaryTreeNode<>(3);
+        node.right = new BinaryTreeNode<>(8);
+        node.left.left = new BinaryTreeNode<>(1);
+        node.right.left = new BinaryTreeNode<>(6);
+
+        assertEquals(List.of(1, 3, 5, 6, 8), inorder.recursive(node));
+        assertEquals(List.of(1, 3, 5, 6, 8), inorder.iterative(node));
+    }
 }
