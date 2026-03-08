@@ -1317,7 +1317,103 @@ return maxSum;
 
 ---
 
+## Binary Tree - DFS
+
+### Quick Reference
+
+| # | Problem | Difficulty | Time | Space | Pattern |
+|---|---------|------------|------|-------|---------|
+| 1 | [Maximum Depth of Binary Tree](#1-maximum-depth-of-binary-tree) | Easy | O(n) | O(h) | [Recursive DFS](#recursive-dfs) |
+| 2 | [Leaf-Similar Trees](#2-leaf-similar-trees) | Easy | O(n1+n2) | O(h1+h2+L) | [Recursive DFS](#recursive-dfs) |
+
+---
+
+### 1. Maximum Depth of Binary Tree
+
+**Approach:** Recursive DFS — at each node, recursively compute the depth of the left and right subtrees and return the greater one plus one. Base case returns 0 for a `null` node.
+
+**Time Complexity:** O(n) — each node is visited exactly once.
+
+**Space Complexity:** O(h) — recursion stack depth, where h is the tree height (O(log n) balanced, O(n) skewed).
+
+**Pattern:** [Recursive DFS](#recursive-dfs) — decompose the problem into left/right subproblems and combine results on the way back up.
+
+**Key Insight:** Maximum depth is defined structurally — you don't need to track a counter. Each return value naturally propagates the depth upward.
+
+**Code:**
+```java
+public int maxDepth(TreeNode root) {
+    if (Objects.isNull(root)) return 0;
+    return calculateDepth(root);
+}
+
+private int calculateDepth(TreeNode node) {
+    if (Objects.isNull(node)) return 0;
+    int leftDepth = calculateDepth(node.left);
+    int rightDepth = calculateDepth(node.right);
+    return Math.max(leftDepth, rightDepth) + 1;
+}
+```
+
+---
+
+### 2. Leaf-Similar Trees
+
+**Approach:** DFS collecting leaf values — traverse each tree and collect its leaf values (left to right) into a list. Two trees are leaf-similar if their leaf lists are equal.
+
+**Time Complexity:** O(n1 + n2) — each node in both trees is visited exactly once.
+
+**Space Complexity:** O(h1 + h2 + L) — recursion stack depths plus the two leaf lists, where h is tree height and L is the number of leaves.
+
+**Pattern:** [Recursive DFS](#recursive-dfs) — collect information at leaf nodes during a full DFS traversal.
+
+**Key Insight:** A node is a leaf when both children are `null`. Traversing left before right guarantees the collected sequence matches left-to-right reading order.
+
+**Code:**
+```java
+public boolean leafSimilar(TreeNode root1, TreeNode root2) {
+    if (Objects.isNull(root1) && Objects.isNull(root2)) return true;
+    List<Integer> firstList = new ArrayList<>();
+    collectLeafs(root1, firstList);
+
+    List<Integer> secondList = new ArrayList<>();
+    collectLeafs(root2, secondList);
+
+    return firstList.equals(secondList);
+}
+
+private void collectLeafs(TreeNode treeNode, List<Integer> list) {
+    if (Objects.isNull(treeNode.left) && Objects.isNull(treeNode.right)) {
+        list.add(treeNode.val);
+    }
+    if (Objects.nonNull(treeNode.left)) collectLeafs(treeNode.left, list);
+    if (Objects.nonNull(treeNode.right)) collectLeafs(treeNode.right, list);
+}
+```
+
+---
+
 ## Key Patterns
+
+### Recursive DFS
+
+**When to use:** Tree problems where the answer at each node depends on results from its subtrees (depth, path sums, leaf sequences, etc.).
+
+**How it works:** Recurse into left and right children, then combine their results on the way back up. Base case handles `null` nodes.
+
+**Template:**
+```java
+int dfs(TreeNode node) {
+    if (node == null) return BASE_VALUE;
+
+    int left = dfs(node.left);
+    int right = dfs(node.right);
+
+    return combine(left, right, node.val);
+}
+```
+
+---
 
 ### Two Pointers
 
