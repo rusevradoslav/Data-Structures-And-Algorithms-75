@@ -1325,6 +1325,7 @@ return maxSum;
 |---|---------|------------|------|-------|---------|
 | 1 | [Maximum Depth of Binary Tree](#1-maximum-depth-of-binary-tree) | Easy | O(n) | O(h) | [Recursive DFS](#recursive-dfs) |
 | 2 | [Leaf-Similar Trees](#2-leaf-similar-trees) | Easy | O(n1+n2) | O(h1+h2+L) | [Recursive DFS](#recursive-dfs) |
+| 3 | [Count Good Nodes in Binary Tree](#3-count-good-nodes-in-binary-tree) | Medium | O(n) | O(h) | [Recursive DFS](#recursive-dfs) |
 
 ---
 
@@ -1388,6 +1389,39 @@ private void collectLeafs(TreeNode treeNode, List<Integer> list) {
     }
     if (Objects.nonNull(treeNode.left)) collectLeafs(treeNode.left, list);
     if (Objects.nonNull(treeNode.right)) collectLeafs(treeNode.right, list);
+}
+```
+
+---
+
+### 3. Count Good Nodes in Binary Tree
+
+**Approach:** Recursive DFS — pass the maximum value seen so far down each path. A node is good if its value is greater than or equal to that maximum. Collect good node values into a list and return its size.
+
+**Time Complexity:** O(n) — each node is visited exactly once.
+
+**Space Complexity:** O(h) — recursion stack depth, where h is the tree height (O(log n) balanced, O(n) skewed).
+
+**Pattern:** [Recursive DFS](#recursive-dfs) — propagate path state (running max) downward and aggregate results on the way back up.
+
+**Key Insight:** The root is always good since it has no ancestors. Using `Integer.MIN_VALUE` as the initial max means the root always satisfies `root.val >= maxSoFar`.
+
+**Code:**
+```java
+public int goodNodes(TreeNode root) {
+    if (Objects.isNull(root)) return 0;
+    List<Integer> goodNodes = new ArrayList<>();
+    countGoodNodes(root, root.val, goodNodes);
+    return goodNodes.size();
+}
+
+private void countGoodNodes(TreeNode node, int val, List<Integer> goodNodes) {
+    if (node.val >= val) {
+        goodNodes.add(node.val);
+        val = node.val;
+    }
+    if (Objects.nonNull(node.left)) countGoodNodes(node.left, val, goodNodes);
+    if (Objects.nonNull(node.right)) countGoodNodes(node.right, val, goodNodes);
 }
 ```
 
