@@ -1428,6 +1428,83 @@ private void countGoodNodes(TreeNode node, int val, List<Integer> goodNodes) {
 
 ---
 
+### 4. Path Sum III
+
+**Problem:** Count the number of downward paths in a binary tree whose node values sum to `targetSum`. A path can start and end at any node (not just root or leaf).
+
+---
+
+#### Approach 1: Brute Force — O(n²)
+
+For every node in the tree, count all paths starting at that node going downward. Two cooperating recursive methods:
+- `countGoodPaths` — visits every node (outer recursion)
+- `countFrom` — counts paths starting at a specific node (inner recursion)
+
+**Time Complexity:** O(n²) — for each of the n nodes, `countFrom` traverses up to n nodes downward.
+
+**Space Complexity:** O(h) — recursion stack depth.
+
+**Code:**
+```java
+public int pathSumBruteForce(TreeNode root, int targetSum) {
+    if (Objects.isNull(root)) return 0;
+    return countGoodPaths(root, targetSum);
+}
+
+private int countGoodPaths(TreeNode root, int targetSum) {
+    if (Objects.isNull(root)) return 0;
+    return countFrom(root, targetSum)
+         + countGoodPaths(root.left, targetSum)
+         + countGoodPaths(root.right, targetSum);
+}
+
+private int countFrom(TreeNode node, long remaining) {
+    if (Objects.isNull(node)) return 0;
+    if (remaining - node.val == 0) {
+        return 1 + countFrom(node.left, 0) + countFrom(node.right, 0);
+    }
+    return countFrom(node.left, remaining - node.val)
+         + countFrom(node.right, remaining - node.val);
+}
+```
+
+---
+
+#### Approach 2: Prefix Sum + HashMap — O(n)
+
+A single DFS tracks the running prefix sum from root to the current node. At each node, if `prefixSum - targetSum` was seen earlier on the path, the segment between that point and the current node is a valid path. The map is seeded with `{0: 1}` to handle paths that start at the root. Backtracking removes the current node's prefix sum so sibling subtrees are not affected.
+
+**Time Complexity:** O(n) — each node is visited exactly once.
+
+**Space Complexity:** O(n) — HashMap stores at most n prefix sums.
+
+**Key Insight:** If the prefix sum at node B is `S` and `S - targetSum` appeared at some ancestor node A, then the path from A+1 to B sums to `targetSum`.
+
+**Code:**
+```java
+public int pathSum(TreeNode root, int targetSum) {
+    if (Objects.isNull(root)) return 0;
+    Map<Long, Integer> map = new HashMap<>();
+    map.put(0L, 1);
+    return dfs(root, 0, targetSum, map);
+}
+
+private int dfs(TreeNode node, long prefixSum, int targetSum, Map<Long, Integer> map) {
+    if (Objects.isNull(node)) return 0;
+    long currentPrefixSum = prefixSum + node.val;
+    int totalCount = map.getOrDefault(currentPrefixSum - targetSum, 0);
+    map.put(currentPrefixSum, map.getOrDefault(currentPrefixSum, 0) + 1);
+    totalCount += dfs(node.left, currentPrefixSum, targetSum, map)
+               + dfs(node.right, currentPrefixSum, targetSum, map);
+    int count = map.get(currentPrefixSum);
+    if (count == 1) map.remove(currentPrefixSum);
+    else map.put(currentPrefixSum, count - 1);
+    return totalCount;
+}
+```
+
+---
+
 ## Key Patterns
 
 ### Recursive DFS
@@ -1445,6 +1522,28 @@ int dfs(TreeNode node) {
     int right = dfs(node.right);
 
     return combine(left, right, node.val);
+}
+```
+
+---
+
+### Prefix Sum + DFS
+
+**When to use:** Tree path problems where paths can start at any node, not just the root — especially when you need to count paths summing to a target in O(n).
+
+**How it works:** Track the running prefix sum from root to the current node. At each node, look up `prefixSum - targetSum` in a HashMap — each occurrence means a valid path ends here. Add the current prefix sum to the map before recursing, and remove it after (backtrack) so sibling subtrees only see prefix sums from their own root-to-node path. Seed the map with `{0: 1}` to handle paths starting at the root.
+
+**Template:**
+```java
+int dfs(TreeNode node, long prefixSum, int target, Map<Long, Integer> map) {
+    if (node == null) return 0;
+    long current = prefixSum + node.val;
+    int count = map.getOrDefault(current - target, 0);
+    map.merge(current, 1, Integer::sum);
+    count += dfs(node.left, current, target, map)
+           + dfs(node.right, current, target, map);
+    if (map.merge(current, -1, Integer::sum) == 0) map.remove(current);
+    return count;
 }
 ```
 
