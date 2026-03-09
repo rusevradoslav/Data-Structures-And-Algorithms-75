@@ -1327,6 +1327,7 @@ return maxSum;
 | 2 | [Leaf-Similar Trees](#2-leaf-similar-trees) | Easy | O(n1+n2) | O(h1+h2+L) | [Recursive DFS](#recursive-dfs) |
 | 3 | [Count Good Nodes in Binary Tree](#3-count-good-nodes-in-binary-tree) | Medium | O(n) | O(h) | [Recursive DFS](#recursive-dfs) |
 | 4 | [Path Sum III](#4-path-sum-iii) | Medium | O(n) | O(n) | [Prefix Sum + DFS](#prefix-sum--dfs) |
+| 5 | [Longest ZigZag Path in a Binary Tree](#5-longest-zigzag-path-in-a-binary-tree) | Medium | O(n) | O(h) | [Recursive DFS](#recursive-dfs) |
 
 ---
 
@@ -1500,6 +1501,35 @@ private int dfs(TreeNode node, long prefixSum, int targetSum, Map<Long, Integer>
     if (count == 1) map.remove(currentPrefixSum);
     else map.put(currentPrefixSum, count - 1);
     return totalCount;
+}
+```
+
+---
+
+### 5. Longest ZigZag Path in a Binary Tree
+
+**Approach:** Recursive DFS — pass the arrival direction (`isLeft`) and current zigzag length down at each step. One child continues the zigzag (`length + 1`), the other resets it (`length = 1`). When a null node is reached, the path ended at its parent, so return `length - 1`.
+
+**Time Complexity:** O(n) — each node is visited exactly once.
+
+**Space Complexity:** O(h) — recursion stack depth, where h is the tree height (O(log n) balanced, O(n) skewed).
+
+**Pattern:** [Recursive DFS](#recursive-dfs) — propagate path state (direction + length) downward and take the max on the way back up.
+
+**Key Insight:** At each node, going in the opposite direction from how you arrived continues the zigzag; going in the same direction resets it. Both children are always explored so no potential path is missed.
+
+**Code:**
+```java
+public int longestZigZag(TreeNode root) {
+    if (Objects.isNull(root)) return 0;
+    return dfs(root, true, 0);
+}
+
+private int dfs(TreeNode node, boolean isLeft, int length) {
+    if (Objects.isNull(node)) return length - 1;
+    int leftLength  = isLeft ? 1 : length + 1;
+    int rightLength = isLeft ? length + 1 : 1;
+    return Math.max(dfs(node.left, true, leftLength), dfs(node.right, false, rightLength));
 }
 ```
 
