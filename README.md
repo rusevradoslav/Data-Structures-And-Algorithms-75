@@ -1326,6 +1326,7 @@ return maxSum;
 | 1 | [Maximum Depth of Binary Tree](#1-maximum-depth-of-binary-tree) | Easy | O(n) | O(h) | [Recursive DFS](#recursive-dfs) |
 | 2 | [Leaf-Similar Trees](#2-leaf-similar-trees) | Easy | O(n1+n2) | O(h1+h2+L) | [Recursive DFS](#recursive-dfs) |
 | 3 | [Count Good Nodes in Binary Tree](#3-count-good-nodes-in-binary-tree) | Medium | O(n) | O(h) | [Recursive DFS](#recursive-dfs) |
+| 4 | [Path Sum III](#4-path-sum-iii) | Medium | O(n) | O(n) | [Prefix Sum + DFS](#prefix-sum--dfs) |
 
 ---
 
