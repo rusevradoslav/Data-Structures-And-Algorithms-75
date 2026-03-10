@@ -64,6 +64,20 @@ public class CountGoodNodesInBinaryTest {
     }
 
     @Test
+    @DisplayName("Two-node tree: left child smaller than root → only root is good")
+    public void testTwoNodeLeftChildSmaller() {
+        TreeNode root = new TreeNode(5, new TreeNode(3), null);
+        assertEquals(1, solution.goodNodes(root));
+    }
+
+    @Test
+    @DisplayName("Two-node tree: right child smaller than root → only root is good")
+    public void testTwoNodeRightChildSmaller() {
+        TreeNode root = new TreeNode(5, null, new TreeNode(3));
+        assertEquals(1, solution.goodNodes(root));
+    }
+
+    @Test
     @DisplayName("All nodes good: strictly increasing path → all count")
     public void testAllNodesGood() {
         // Path values strictly increase: 1 → 2 → 3 → 4

@@ -46,7 +46,7 @@ public class LeafSimilarTreesTest {
     }
 
     @Test
-    @DisplayName("Example 2: leaf sequences [2] vs [2] → true, different structures")
+    @DisplayName("Example 2: leaf sequences [2,3] vs [3,2] → false, same leaves different order")
     public void testExample2() {
         TreeNode root1 = new TreeNode(1,
                 new TreeNode(2), new TreeNode(3));
@@ -62,6 +62,13 @@ public class LeafSimilarTreesTest {
     @DisplayName("Both roots null → true")
     public void testBothNull() {
         assertTrue(solution.leafSimilar(null, null));
+    }
+
+    @Test
+    @DisplayName("One root null, other non-null → false")
+    public void testOneNullRoot() {
+        assertFalse(solution.leafSimilar(null, new TreeNode(1)));
+        assertFalse(solution.leafSimilar(new TreeNode(1), null));
     }
 
     @Test
