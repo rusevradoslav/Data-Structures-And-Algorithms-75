@@ -53,6 +53,9 @@ public class LeafSimilarTrees {
     }
 
     private void collectLeafs(TreeNode treeNode, List<Integer> list) {
+        if (Objects.isNull(treeNode)) {
+            return;
+        }
         if (Objects.isNull(treeNode.left) && Objects.isNull(treeNode.right)) {
             list.add(treeNode.val);
         }

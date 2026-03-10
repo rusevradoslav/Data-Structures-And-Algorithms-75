@@ -1406,7 +1406,7 @@ private void collectLeafs(TreeNode treeNode, List<Integer> list) {
 
 **Pattern:** [Recursive DFS](#recursive-dfs) — propagate path state (running max) downward and aggregate results on the way back up.
 
-**Key Insight:** The root is always good since it has no ancestors. Using `Integer.MIN_VALUE` as the initial max means the root always satisfies `root.val >= maxSoFar`.
+**Key Insight:** The root is always good since it has no ancestors. The path maximum is seeded with `root.val`, so the first comparison `node.val >= val` evaluates to `root.val >= root.val`, which is always true.
 
 **Code:**
 ```java

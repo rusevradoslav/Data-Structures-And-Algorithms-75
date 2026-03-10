@@ -119,6 +119,15 @@ public class PathSum3Test {
     }
 
     @Test
+    @DisplayName("Zero-value node extends already-matched path → both paths counted")
+    public void testZeroValueNode() {
+        // Path "1" sums to 1, path "1→0" also sums to 1 — both valid
+        TreeNode root = new TreeNode(1, new TreeNode(0), null);
+        assertEquals(2, solution.pathSum(root, 1));
+        assertEquals(2, solution.pathSumBruteForce(root, 1));
+    }
+
+    @Test
     @DisplayName("No valid path → 0")
     public void testNoValidPath() {
         TreeNode root = new TreeNode(1,

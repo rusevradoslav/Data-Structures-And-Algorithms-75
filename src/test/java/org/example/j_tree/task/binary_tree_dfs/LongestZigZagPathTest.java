@@ -85,12 +85,24 @@ public class LongestZigZagPathTest {
     }
 
     @Test
-    @DisplayName("All left children → 0")
+    @DisplayName("All left children → 1")
     public void testAllLeft() {
         TreeNode root = new TreeNode(1,
                 new TreeNode(1,
                         new TreeNode(1), null),
                 null);
+
+        assertEquals(1, solution.longestZigZag(root));
+    }
+
+    @Test
+    @DisplayName("All right children → 1")
+    public void testAllRight() {
+        TreeNode root = new TreeNode(1,
+                null,
+                new TreeNode(1,
+                        null,
+                        new TreeNode(1)));
 
         assertEquals(1, solution.longestZigZag(root));
     }
