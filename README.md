@@ -1328,6 +1328,7 @@ return maxSum;
 | 3 | [Count Good Nodes in Binary Tree](#3-count-good-nodes-in-binary-tree) | Medium | O(n) | O(h) | [Recursive DFS](#recursive-dfs) |
 | 4 | [Path Sum III](#4-path-sum-iii) | Medium | O(n) | O(n) | [Prefix Sum + DFS](#prefix-sum--dfs) |
 | 5 | [Longest ZigZag Path in a Binary Tree](#5-longest-zigzag-path-in-a-binary-tree) | Medium | O(n) | O(h) | [Recursive DFS](#recursive-dfs) |
+| 6 | [Lowest Common Ancestor of a Binary Tree](#6-lowest-common-ancestor-of-a-binary-tree) | Medium | O(n) | O(h) | [Post-order DFS](#post-order-dfs) |
 
 ---
 
@@ -1535,6 +1536,38 @@ private int dfs(TreeNode node, boolean isLeft, int length) {
 
 ---
 
+### 6. Lowest Common Ancestor of a Binary Tree
+
+**Approach:** Post-order DFS — recurse into both subtrees first, then decide at the current node. If the current node is `p` or `q`, return it. If both left and right return non-null, the current node is the LCA. Otherwise bubble up whichever side found something.
+
+**Time Complexity:** O(n) — each node is visited at most once.
+
+**Space Complexity:** O(h) — recursion stack depth, where h is the tree height (O(log n) balanced, O(n) skewed).
+
+**Pattern:** [Post-order DFS](#post-order-dfs) — results from both subtrees are needed before making a decision at the current node.
+
+**Key Insight:** A node is the LCA if `p` is found in one subtree and `q` in the other, OR if the node itself is `p` or `q` (since a node is a descendant of itself).
+
+**Code:**
+```java
+public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+    if (Objects.isNull(root)) return null;
+    if (Objects.equals(root.val, p.val) || Objects.equals(root.val, q.val)) return root;
+    return dfs(root, p, q);
+}
+
+private TreeNode dfs(TreeNode node, TreeNode p, TreeNode q) {
+    if (Objects.isNull(node)) return null;
+    if (Objects.equals(node.val, p.val) || Objects.equals(node.val, q.val)) return node;
+    TreeNode left  = dfs(node.left,  p, q);
+    TreeNode right = dfs(node.right, p, q);
+    if (Objects.nonNull(left) && Objects.nonNull(right)) return node;
+    return Objects.nonNull(left) ? left : right;
+}
+```
+
+---
+
 ## Key Patterns
 
 ### Recursive DFS
@@ -1552,6 +1585,25 @@ int dfs(TreeNode node) {
     int right = dfs(node.right);
 
     return combine(left, right, node.val);
+}
+```
+
+---
+
+### Post-order DFS
+
+**When to use:** Tree problems where you need information from **both** subtrees before you can make a decision at the current node (e.g., LCA, checking subtree properties).
+
+**How it works:** Recurse into left and right children first, then combine their results at the current node. The decision is made on the way **back up**, not on the way down.
+
+**Template:**
+```java
+TreeNode dfs(TreeNode node) {
+    if (node == null) return null;
+    TreeNode left  = dfs(node.left);
+    TreeNode right = dfs(node.right);
+    // decide based on left and right results
+    return ...;
 }
 ```
 
