@@ -1,4 +1,6 @@
-package org.example.j_tree.binary_tree_representation_and_traversal;
+package org.example.j_tree.binary_tree_representation_and_traversal.dfs;
+
+import org.example.j_tree.binary_tree_representation_and_traversal.BinaryTreeNode;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -8,22 +10,24 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Preorder (Root → Left → Right) binary tree traversal.
+ * Inorder DFS (Left → Root → Right) binary tree traversal.
  *
- * <p>Visits the current node first, then recursively traverses the left subtree,
- * followed by the right subtree.
+ * <p>Recursively traverses the left subtree, visits the current node,
+ * then recursively traverses the right subtree. For a BST this produces
+ * values in sorted ascending order.
  *
  * <p><b>Recursive approach ({@link #recursive}):</b>
  * <ul>
+ *   <li>Recurse into the left child</li>
  *   <li>Add the current node's value to the result</li>
- *   <li>Recurse into the left child, then the right child</li>
+ *   <li>Recurse into the right child</li>
  * </ul>
  *
  * <p><b>Iterative approach ({@link #iterative}):</b>
  * <ul>
- *   <li>Push the root onto a stack</li>
- *   <li>Pop a node, add its value, then push right before left
- *       (so left is popped first, preserving Root → Left → Right order)</li>
+ *   <li>Drill left as far as possible, pushing each node onto the stack</li>
+ *   <li>Pop a node, add its value to the result</li>
+ *   <li>Move to the popped node's right child and repeat</li>
  * </ul>
  *
  * <p>Example:
@@ -34,7 +38,7 @@ import java.util.Objects;
  *     / \     \
  *    3   7    20
  *
- * Preorder: [10, 5, 3, 7, 15, 20]
+ * Inorder: [3, 5, 7, 10, 15, 20]
  * </pre>
  *
  * <p>Time Complexity: O(n) — each node visited exactly once.
@@ -44,13 +48,13 @@ import java.util.Objects;
  *
  * @param <E> the type of value stored in each tree node
  */
-public class PreorderBinaryTreeTraversal<E> implements BinaryTreeTraversal<E> {
+public class InorderBinaryTreeTraversalImpl<E> implements BinaryTreeTraversal<E> {
 
     /**
      * {@inheritDoc}
      *
-     * <p>Delegates to a recursive helper that visits the node, then its left
-     * and right children.
+     * <p>Delegates to a recursive helper that visits the left subtree,
+     * then the node, then the right subtree.
      */
     @Override
     public List<E> recursive(BinaryTreeNode<E> node) {
@@ -63,27 +67,27 @@ public class PreorderBinaryTreeTraversal<E> implements BinaryTreeTraversal<E> {
         }
 
         List<E> result = new ArrayList<>();
-        executePreorderDfs(node, result);
+        executeInorderDfs(node, result);
         return result;
     }
 
-    private void executePreorderDfs(BinaryTreeNode<E> node, List<E> result) {
-        if (Objects.nonNull(node)) {
-            result.add(node.val);
-        }
+    private void executeInorderDfs(BinaryTreeNode<E> node, List<E> result) {
         if (Objects.nonNull(node.left)) {
-            executePreorderDfs(node.left, result);
+            executeInorderDfs(node.left, result);
         }
+
+        result.add(node.val);
+
         if (Objects.nonNull(node.right)) {
-            executePreorderDfs(node.right, result);
+            executeInorderDfs(node.right, result);
         }
     }
 
     /**
      * {@inheritDoc}
      *
-     * <p>Uses a stack: pops a node, records its value, then pushes right
-     * before left so the left child is processed first.
+     * <p>Uses a stack to drill left, then pops and visits each node before
+     * moving to its right child.
      */
     @Override
     public List<E> iterative(BinaryTreeNode<E> node) {
@@ -94,21 +98,22 @@ public class PreorderBinaryTreeTraversal<E> implements BinaryTreeTraversal<E> {
         if (Objects.isNull(node.left) && Objects.isNull(node.right)) {
             return Collections.singletonList(node.val);
         }
+
         List<E> result = new ArrayList<>();
-
         Deque<BinaryTreeNode<E>> stack = new ArrayDeque<>();
-        stack.push(node);
-        while (!stack.isEmpty()) {
-            BinaryTreeNode<E> currentNode = stack.pop();
-            result.add(currentNode.val);
-            if (Objects.nonNull(currentNode.right)) {
-                stack.push(currentNode.right);
+        BinaryTreeNode<E> current = node;
+
+        while (current != null || !stack.isEmpty()) {
+            while (current != null) {
+                stack.push(current);
+                current = current.left;
             }
 
-            if (Objects.nonNull(currentNode.left)) {
-                stack.push(currentNode.left);
-            }
+            current = stack.pop();
+            result.add(current.val);
+            current = current.right;
         }
+
         return result;
     }
 }

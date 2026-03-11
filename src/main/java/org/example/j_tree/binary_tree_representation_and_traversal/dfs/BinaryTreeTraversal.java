@@ -1,10 +1,16 @@
-package org.example.j_tree.binary_tree_representation_and_traversal;
+package org.example.j_tree.binary_tree_representation_and_traversal.dfs;
+
+import org.example.j_tree.binary_tree_representation_and_traversal.BinaryTreeNode;
 
 import java.util.List;
 
 /**
- * Contract for binary tree traversal strategies, providing both a recursive
+ * Contract for binary tree DFS traversal strategies, providing both a recursive
  * and an iterative implementation of the same traversal order.
+ *
+ * <p>All implementations (inorder, preorder, postorder) are forms of
+ * <b>Depth-First Search (DFS)</b> — they explore as far down a branch as possible
+ * before backtracking.
  *
  * @param <E> the type of value stored in each tree node
  */

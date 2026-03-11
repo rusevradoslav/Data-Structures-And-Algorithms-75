@@ -1,4 +1,6 @@
-package org.example.j_tree.binary_tree_representation_and_traversal;
+package org.example.j_tree.binary_tree_representation_and_traversal.dfs;
+
+import org.example.j_tree.binary_tree_representation_and_traversal.BinaryTreeNode;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -9,7 +11,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Postorder (Left → Right → Root) binary tree traversal.
+ * Postorder DFS (Left → Right → Root) binary tree traversal.
  *
  * <p>Recursively traverses the left subtree, then the right subtree,
  * and finally visits the current node.
