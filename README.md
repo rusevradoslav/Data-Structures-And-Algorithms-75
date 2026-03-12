@@ -1568,7 +1568,78 @@ private TreeNode dfs(TreeNode node, TreeNode p, TreeNode q) {
 
 ---
 
+## Binary Tree - BFS
+
+### Quick Reference
+
+| # | Problem | Difficulty | Time | Space | Pattern |
+|---|---------|------------|------|-------|---------|
+| 1 | [Binary Tree Right Side View](#1-binary-tree-right-side-view) | Medium | O(n) | O(w) | [BFS Level-Order](#bfs-level-order) |
+
+---
+
+### 1. Binary Tree Right Side View
+
+**Approach:** BFS level-order traversal — process nodes level by level using a queue. For each level, snapshot its size before iterating so you know exactly when you reach the last node. The last node in each level is the rightmost visible node from the right side.
+
+**Time Complexity:** O(n) — each node is visited exactly once.
+
+**Space Complexity:** O(w) — where w is the maximum width of the tree (maximum number of nodes at any single level).
+
+**Pattern:** [BFS Level-Order](#bfs-level-order) — snapshot queue size to process exactly one level per outer iteration.
+
+**Key Insight:** You don't need to track direction or depth explicitly. Snapshotting `size = queue.size()` before the inner loop isolates each level — the node at index `i == size - 1` is always the rightmost node of that level.
+
+**Code:**
+```java
+public List<Integer> rightSideView(TreeNode root) {
+    List<Integer> res = new ArrayList<>();
+    if (Objects.isNull(root)) return res;
+
+    Deque<TreeNode> queue = new ArrayDeque<>();
+    queue.offer(root);
+    while (!queue.isEmpty()) {
+        int size = queue.size();
+        for (int i = 0; i < size; i++) {
+            TreeNode node = queue.poll();
+            if (i == size - 1) res.add(node.val);
+            if (Objects.nonNull(node.left))  queue.offer(node.left);
+            if (Objects.nonNull(node.right)) queue.offer(node.right);
+        }
+    }
+    return res;
+}
+```
+
+---
+
 ## Key Patterns
+
+### BFS Level-Order
+
+**When to use:** Tree problems that require processing nodes level by level — right/left side views, level averages, level maximums, zigzag traversal.
+
+**How it works:** Enqueue the root, then repeatedly snapshot the current queue size before the inner loop. Process exactly that many nodes (one full level), enqueue their children, then move to the next level.
+
+**Template:**
+```java
+void bfs(TreeNode root) {
+    if (root == null) return;
+    Queue<TreeNode> queue = new ArrayDeque<>();
+    queue.offer(root);
+    while (!queue.isEmpty()) {
+        int size = queue.size();           // snapshot current level size
+        for (int i = 0; i < size; i++) {
+            TreeNode node = queue.poll();
+            // process node (e.g. last node: i == size - 1)
+            if (node.left  != null) queue.offer(node.left);
+            if (node.right != null) queue.offer(node.right);
+        }
+    }
+}
+```
+
+---
 
 ### Recursive DFS
 
