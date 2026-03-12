@@ -1575,6 +1575,7 @@ private TreeNode dfs(TreeNode node, TreeNode p, TreeNode q) {
 | # | Problem | Difficulty | Time | Space | Pattern |
 |---|---------|------------|------|-------|---------|
 | 1 | [Binary Tree Right Side View](#1-binary-tree-right-side-view) | Medium | O(n) | O(w) | [BFS Level-Order](#bfs-level-order) |
+| 2 | [Maximum Level Sum of a Binary Tree](#2-maximum-level-sum-of-a-binary-tree) | Medium | O(n) | O(w) | [BFS Level-Order](#bfs-level-order) |
 
 ---
 
@@ -1608,6 +1609,50 @@ public List<Integer> rightSideView(TreeNode root) {
         }
     }
     return res;
+}
+```
+
+---
+
+### 2. Maximum Level Sum of a Binary Tree
+
+**Approach:** BFS level-order traversal — accumulate the sum of all node values per level. Update the result only when the current level sum is **strictly greater** than the previous maximum, so ties naturally keep the smallest level number.
+
+**Time Complexity:** O(n) — each node is visited exactly once.
+
+**Space Complexity:** O(w) — where w is the maximum width of the tree (maximum number of nodes at any single level).
+
+**Pattern:** [BFS Level-Order](#bfs-level-order) — snapshot queue size to process exactly one level per outer iteration.
+
+**Key Insight:** Using `tempSum > maxSum` (strict) instead of `>=` ensures that when multiple levels share the same sum, the first (smallest) level number is preserved.
+
+**Code:**
+```java
+public int maxLevelSum(TreeNode root) {
+    if (Objects.isNull(root)) return 0;
+
+    int result = 0;
+    int maxSum = Integer.MIN_VALUE;
+    Queue<TreeNode> queue = new LinkedList<>();
+    queue.offer(root);
+    int levelCounter = 1;
+
+    while (!queue.isEmpty()) {
+        int size = queue.size();
+        int tempSum = 0;
+        for (int i = 0; i < size; i++) {
+            TreeNode node = queue.poll();
+            tempSum += node.val;
+            if (Objects.nonNull(node.left))  queue.offer(node.left);
+            if (Objects.nonNull(node.right)) queue.offer(node.right);
+        }
+        if (tempSum > maxSum) {
+            maxSum = tempSum;
+            result = levelCounter;
+        }
+        levelCounter++;
+    }
+    return result;
 }
 ```
 
