@@ -1,6 +1,6 @@
-package org.example.j_tree.binary_tree_representation_and_traversal.dfs;
+package org.example.j_tree.binary_tree.dfs;
 
-import org.example.j_tree.binary_tree_representation_and_traversal.BinaryTreeNode;
+import org.example.j_tree.binary_tree.BinaryTreeNode;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;

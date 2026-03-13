@@ -1,4 +1,4 @@
-package org.example.j_tree.binary_tree_representation_and_traversal;
+package org.example.j_tree.binary_tree;
 
 /**
  * A node in a binary tree, holding a value and references to left and right children.

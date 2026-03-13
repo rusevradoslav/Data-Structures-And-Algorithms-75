@@ -1,6 +1,6 @@
-package org.example.j_tree.binary_tree_representation_and_traversal.bfs;
+package org.example.j_tree.binary_tree.bfs;
 
-import org.example.j_tree.binary_tree_representation_and_traversal.BinaryTreeNode;
+import org.example.j_tree.binary_tree.BinaryTreeNode;
 
 /**
  * Contract for binary tree BFS traversal strategies.

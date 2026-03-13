@@ -1,6 +1,6 @@
-package org.example.j_tree.binary_tree_representation_and_traversal;
+package org.example.j_tree.binary_tree;
 
-import org.example.j_tree.binary_tree_representation_and_traversal.bfs.BfsFlatBinaryTreeTraversalImpl;
+import org.example.j_tree.binary_tree.bfs.BfsFlatBinaryTreeTraversalImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
