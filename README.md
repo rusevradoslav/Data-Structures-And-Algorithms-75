@@ -1658,6 +1658,40 @@ public int maxLevelSum(TreeNode root) {
 
 ---
 
+## Binary Search Tree
+
+### Quick Reference
+
+| # | Problem | Difficulty | Time | Space | Pattern |
+|---|---------|------------|------|-------|---------|
+| 1 | [Search in a Binary Search Tree](#1-search-in-a-binary-search-tree) | Easy | O(h) | O(h) | [BST Navigation](#bst-navigation) |
+
+---
+
+### 1. Search in a Binary Search Tree
+
+**Approach:** Recursive BST navigation — compare `val` to the current node's value to decide which subtree to recurse into. Return the node itself (entire subtree) when found.
+
+**Time Complexity:** O(h) — O(log n) for a balanced BST, O(n) for a skewed tree.
+
+**Space Complexity:** O(h) — recursion stack depth, where h is the tree height.
+
+**Pattern:** [BST Navigation](#bst-navigation) — use the BST property to eliminate half the tree at each step.
+
+**Key Insight:** Unlike a regular binary tree search, you never need to explore both subtrees. The BST property guarantees the target can only be in one direction.
+
+**Code:**
+```java
+public TreeNode searchBST(TreeNode root, int val) {
+    if (Objects.isNull(root)) return null;
+    if (root.val == val) return root;
+    if (val < root.val) return searchBST(root.left, val);
+    return searchBST(root.right, val);
+}
+```
+
+---
+
 ## Key Patterns
 
 ### BFS Level-Order
