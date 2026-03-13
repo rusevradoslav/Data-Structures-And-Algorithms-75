@@ -1665,6 +1665,7 @@ public int maxLevelSum(TreeNode root) {
 | # | Problem | Difficulty | Time | Space | Pattern |
 |---|---------|------------|------|-------|---------|
 | 1 | [Search in a Binary Search Tree](#1-search-in-a-binary-search-tree) | Easy | O(h) | O(h) | [BST Navigation](#bst-navigation) |
+| 2 | [Delete Node in a BST](#2-delete-node-in-a-bst) | Medium | O(h) | O(h) | [BST Navigation](#bst-navigation) |
 
 ---
 
@@ -1687,6 +1688,37 @@ public TreeNode searchBST(TreeNode root, int val) {
     if (root.val == val) return root;
     if (val < root.val) return searchBST(root.left, val);
     return searchBST(root.right, val);
+}
+```
+
+---
+
+### 2. Delete Node in a BST
+
+**Approach:** Recursive BST deletion — navigate to the target node, then handle three cases: leaf (unlink), one child (splice out), two children (replace with in-order successor and delete it).
+
+**Time Complexity:** O(h) — O(log n) for a balanced BST, O(n) for a skewed tree.
+
+**Space Complexity:** O(h) — recursion stack depth, where h is the tree height.
+
+**Pattern:** [BST Navigation](#bst-navigation) — use the BST property to navigate, then restructure only at the deletion point.
+
+**Key Insight:** When deleting a two-children node, you don't restructure the tree — you replace its value with the in-order successor (leftmost node of the right subtree) and recursively delete that successor instead.
+
+**Code:**
+```java
+public TreeNode deleteNode(TreeNode root, int key) {
+    if (Objects.isNull(root)) return null;
+    if (root.val < key) root.right = deleteNode(root.right, key);
+    else if (root.val > key) root.left = deleteNode(root.left, key);
+    else {
+        if (Objects.isNull(root.left)) return root.right;
+        if (Objects.isNull(root.right)) return root.left;
+        int successor = findMinElement(root.right);
+        root.val = successor;
+        root.right = deleteNode(root.right, successor);
+    }
+    return root;
 }
 ```
 
