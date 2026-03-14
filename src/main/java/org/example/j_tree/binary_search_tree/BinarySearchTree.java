@@ -118,9 +118,9 @@ public class BinarySearchTree<E extends Comparable<E>> {
             if (Objects.isNull(node.right)) {
                 return node.left;
             }
-            E minElelemntFromRightTree = findMin(node.right);
-            node.val = minElelemntFromRightTree;
-            node.right = delete(node.right, minElelemntFromRightTree);
+            E minElementFromRightTree = findMin(node.right);
+            node.val = minElementFromRightTree;
+            node.right = delete(node.right, minElementFromRightTree);
         }
 
         return node;
