@@ -1,9 +1,11 @@
 [![codecov](https://codecov.io/github/rusevradoslav/LeetCode75/graph/badge.svg?token=LG0zNafid5)](https://codecov.io/github/rusevradoslav/LeetCode75)
 ![CI](https://github.com/rusevradoslav/LeetCode75/actions/workflows/ci.yml/badge.svg)
 
-# LeetCode 75: Java Solutions
+# Algorithms & Data Structures
 
-This repository contains Java solutions for the LeetCode 75 study plan. Each solution includes documented code with time and space complexity analysis.
+In this repository you will find implementations of the most common data structures and algorithms, organized by topic. The problems are split across areas like arrays, trees, graphs, dynamic programming, and more — each with a working solution, unit tests, and time & space complexity analysis.
+
+Topics range from foundational concepts like arrays, linked lists, and binary search, to more advanced ones like graph traversal, dynamic programming, and tries. Each section starts with a quick reference table and dives into the problem, the approach taken, and why it works.
 
 ## Sections
 
