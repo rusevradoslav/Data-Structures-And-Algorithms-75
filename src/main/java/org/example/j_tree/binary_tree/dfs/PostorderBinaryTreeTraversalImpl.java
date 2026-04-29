@@ -2,13 +2,7 @@ package org.example.j_tree.binary_tree.dfs;
 
 import org.example.j_tree.binary_tree.BinaryTreeNode;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Postorder DFS (Left → Right → Root) binary tree traversal.
@@ -69,17 +63,18 @@ public class PostorderBinaryTreeTraversalImpl<E> implements BinaryTreeTraversal<
         }
 
         List<E> result = new ArrayList<>();
-        executePostorderDfs(node, result);
+
+        executePostorderDFS(result, node);
+
         return result;
     }
 
-    private void executePostorderDfs(BinaryTreeNode<E> node, List<E> result) {
-        if (Objects.nonNull(node.left)) {
-            executePostorderDfs(node.left, result);
+    private void executePostorderDFS(List<E> result, BinaryTreeNode<E> node) {
+        if (Objects.isNull(node)) {
+            return;
         }
-        if (Objects.nonNull(node.right)) {
-            executePostorderDfs(node.right, result);
-        }
+        executePostorderDFS(result, node.left);
+        executePostorderDFS(result, node.right);
         result.add(node.val);
     }
 
@@ -92,7 +87,6 @@ public class PostorderBinaryTreeTraversalImpl<E> implements BinaryTreeTraversal<
      */
     @Override
     public List<E> iterative(BinaryTreeNode<E> node) {
-
         if (Objects.isNull(node)) {
             return Collections.emptyList();
         }
@@ -100,20 +94,18 @@ public class PostorderBinaryTreeTraversalImpl<E> implements BinaryTreeTraversal<
         if (Objects.isNull(node.left) && Objects.isNull(node.right)) {
             return Collections.singletonList(node.val);
         }
-
         List<E> result = new LinkedList<>();
-
         Deque<BinaryTreeNode<E>> stack = new ArrayDeque<>();
-        stack.push(node);
+        stack.offerLast(node);
         while (!stack.isEmpty()) {
-            BinaryTreeNode<E> current = stack.pop();
-            if (Objects.nonNull(current.left)) {
-                stack.push(current.left);
+            BinaryTreeNode<E> currentNode = stack.pollLast();
+            if (Objects.nonNull(currentNode.left)) {
+                stack.offerLast(currentNode.left);
             }
-            if (Objects.nonNull(current.right)) {
-                stack.push(current.right);
+            if (Objects.nonNull(currentNode.right)) {
+                stack.offerLast(currentNode.right);
             }
-            result.addFirst(current.val);
+            result.addFirst(currentNode.val);
         }
 
         return result;
