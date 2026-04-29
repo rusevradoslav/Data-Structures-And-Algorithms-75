@@ -64,9 +64,9 @@ public class PreorderBinaryTreeTraversal<E> implements BinaryTreeTraversal<E> {
             return Collections.singletonList(node.val);
         }
 
-        List<E> res = new ArrayList<>();
-        executePreorderDFS(res, node);
-        return res;
+        List<E> result = new ArrayList<>();
+        executePreorderDFS(result, node);
+        return result;
     }
 
     private void executePreorderDFS(List<E> res, BinaryTreeNode<E> node) {
