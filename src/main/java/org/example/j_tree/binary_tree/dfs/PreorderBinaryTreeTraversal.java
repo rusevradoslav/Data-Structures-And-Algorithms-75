@@ -64,21 +64,18 @@ public class PreorderBinaryTreeTraversal<E> implements BinaryTreeTraversal<E> {
             return Collections.singletonList(node.val);
         }
 
-        List<E> result = new ArrayList<>();
-        executePreorderDfs(node, result);
-        return result;
+        List<E> res = new ArrayList<>();
+        executePreorderDFS(res, node);
+        return res;
     }
 
-    private void executePreorderDfs(BinaryTreeNode<E> node, List<E> result) {
-        if (Objects.nonNull(node)) {
-            result.add(node.val);
+    private void executePreorderDFS(List<E> res, BinaryTreeNode<E> node) {
+        if (Objects.isNull(node)) {
+            return;
         }
-        if (Objects.nonNull(node.left)) {
-            executePreorderDfs(node.left, result);
-        }
-        if (Objects.nonNull(node.right)) {
-            executePreorderDfs(node.right, result);
-        }
+        res.add(node.val);
+        executePreorderDFS(res, node.left);
+        executePreorderDFS(res, node.right);
     }
 
     /**
@@ -96,19 +93,20 @@ public class PreorderBinaryTreeTraversal<E> implements BinaryTreeTraversal<E> {
         if (Objects.isNull(node.left) && Objects.isNull(node.right)) {
             return Collections.singletonList(node.val);
         }
+
         List<E> result = new ArrayList<>();
-
         Deque<BinaryTreeNode<E>> stack = new ArrayDeque<>();
-        stack.push(node);
-        while (!stack.isEmpty()) {
-            BinaryTreeNode<E> currentNode = stack.pop();
-            result.add(currentNode.val);
-            if (Objects.nonNull(currentNode.right)) {
-                stack.push(currentNode.right);
-            }
+        stack.offerLast(node);
 
-            if (Objects.nonNull(currentNode.left)) {
-                stack.push(currentNode.left);
+        while (!stack.isEmpty()) {
+            BinaryTreeNode<E> topNode = stack.pollLast();
+            result.add(topNode.val);
+
+            if (Objects.nonNull(topNode.right)){
+                stack.offerLast(topNode.right);
+            }
+            if (Objects.nonNull(topNode.left)){
+                stack.offerLast(topNode.left);
             }
         }
         return result;
