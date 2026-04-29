@@ -45,9 +45,7 @@ public class LowestCommonAncestor {
         if (Objects.isNull(root)) {
             return null;
         }
-        if (Objects.equals(root.val, p.val) || Objects.equals(root.val, q.val)) {
-            return root;
-        }
+
         return dfs(root, p, q);
     }
 
