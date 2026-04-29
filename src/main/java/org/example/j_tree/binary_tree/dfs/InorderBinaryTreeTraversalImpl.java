@@ -67,21 +67,19 @@ public class InorderBinaryTreeTraversalImpl<E> implements BinaryTreeTraversal<E>
         }
 
         List<E> result = new ArrayList<>();
-        executeInorderDfs(node, result);
+        executeInorderDFS(result, node);
         return result;
     }
 
-    private void executeInorderDfs(BinaryTreeNode<E> node, List<E> result) {
-        if (Objects.nonNull(node.left)) {
-            executeInorderDfs(node.left, result);
+    private void executeInorderDFS(List<E> result, BinaryTreeNode<E> node) {
+        if (Objects.isNull(node)) {
+            return;
         }
-
+        executeInorderDFS(result, node.left);
         result.add(node.val);
-
-        if (Objects.nonNull(node.right)) {
-            executeInorderDfs(node.right, result);
-        }
+        executeInorderDFS(result, node.right);
     }
+
 
     /**
      * {@inheritDoc}
@@ -101,19 +99,18 @@ public class InorderBinaryTreeTraversalImpl<E> implements BinaryTreeTraversal<E>
 
         List<E> result = new ArrayList<>();
         Deque<BinaryTreeNode<E>> stack = new ArrayDeque<>();
-        BinaryTreeNode<E> current = node;
+        BinaryTreeNode<E> currentNode = node;
 
-        while (current != null || !stack.isEmpty()) {
-            while (current != null) {
-                stack.push(current);
-                current = current.left;
+        while (Objects.nonNull(currentNode) || !stack.isEmpty()) {
+            while (Objects.nonNull(currentNode)) {
+                stack.offerLast(currentNode);
+                currentNode = currentNode.left;
             }
 
-            current = stack.pop();
-            result.add(current.val);
-            current = current.right;
+            BinaryTreeNode<E> lastNode = stack.removeLast();
+            result.add(lastNode.val);
+            currentNode = lastNode.right;
         }
-
         return result;
     }
 }
