@@ -2,9 +2,9 @@ package org.example.j_tree.task.binary_tree_bfs;
 
 import org.example.j_tree.task.TreeNode;
 
-import java.util.LinkedList;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Objects;
-import java.util.Queue;
 
 /**
  * LeetCode 1161 — Maximum Level Sum of a Binary Tree (Medium).
@@ -45,7 +45,7 @@ public class MaximumLevelSumOfABinaryTree {
 
         int result = 0;
         int maxSum = Integer.MIN_VALUE;
-        Queue<TreeNode> queue = new LinkedList<>();
+        Deque<TreeNode> queue = new ArrayDeque<>();
         queue.offer(root);
 
         int levelCounter = 1;
