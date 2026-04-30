@@ -64,12 +64,11 @@ public class ConstructBinaryTreeFromInorderAndPostorderTraversal {
             return null;
         }
 
-        int nodeValue = postorder[postOrderIndex--];
-        TreeNode root = new TreeNode(nodeValue);
-        Integer postorderNodeIndex = map.get(nodeValue);
-        root.right = createTree(postorder, postorderNodeIndex + 1, right);
-        root.left = createTree(postorder, left, postorderNodeIndex - 1);
-
+        int currentValue = postorder[postOrderIndex--];
+        TreeNode root = new TreeNode(currentValue);
+        int currentValueInorderIndex = map.get(currentValue);
+        root.right = createTree(postorder, currentValueInorderIndex + 1, right);
+        root.left = createTree(postorder, left, currentValueInorderIndex - 1);
         return root;
     }
 }
