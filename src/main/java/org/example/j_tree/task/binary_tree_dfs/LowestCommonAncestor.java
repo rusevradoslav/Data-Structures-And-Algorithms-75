@@ -42,10 +42,6 @@ import java.util.Objects;
 public class LowestCommonAncestor {
 
     public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
-        if (Objects.isNull(root)) {
-            return null;
-        }
-
         return dfs(root, p, q);
     }
 
