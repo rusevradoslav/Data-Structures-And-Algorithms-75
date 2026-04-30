@@ -47,6 +47,10 @@ public class MaximumDepthOfBinaryTree {
             return 0;
         }
 
+        if (Objects.isNull(root.left) && Objects.isNull(root.right)) {
+            return 1;
+        }
+
         return calculateDepth(root);
     }
 
