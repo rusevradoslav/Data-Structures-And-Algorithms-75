@@ -132,15 +132,10 @@ public class PathSum3 {
         if (Objects.isNull(node)) {
             return 0;
         }
-        if (remaining - node.val == 0) {
-            int leftCount = countFrom(node.left, 0);
-            int rightCount = countFrom(node.right, 0);
-            return leftCount + rightCount + 1;
-        }
-
+        int currentCount = node.val == remaining ? 1 : 0;
         int leftCount = countFrom(node.left, remaining - node.val);
         int rightCount = countFrom(node.right, remaining - node.val);
 
-        return leftCount + rightCount;
+        return currentCount + leftCount + rightCount;
     }
 }
