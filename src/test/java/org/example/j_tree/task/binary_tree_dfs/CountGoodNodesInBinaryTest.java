@@ -125,4 +125,15 @@ public class CountGoodNodesInBinaryTest {
 
         assertEquals(2, solution.goodNodes(root));
     }
+
+    @Test
+    @DisplayName("[9,null,3,6] → 1 (only root is good; 3 < 9, 6 < 9)")
+    public void testRightSkewedDescendantsSmaller() {
+        TreeNode root = new TreeNode(9,
+                null,
+                new TreeNode(3,
+                        new TreeNode(6), null));
+
+        assertEquals(1, solution.goodNodes(root));
+    }
 }
