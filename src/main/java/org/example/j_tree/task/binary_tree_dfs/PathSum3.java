@@ -52,27 +52,26 @@ public class PathSum3 {
      * @param map       prefix sum frequency map for the current root-to-node path
      * @return number of valid paths in the subtree rooted at this node
      */
-    private int dfs(TreeNode node, long prefixSum, int targetSum, Map<Long, Integer> map) {
+    private int dfs(TreeNode node, long parentSum, int targetSum, Map<Long, Integer> prefixSumFrequency) {
         if (Objects.isNull(node)) {
             return 0;
         }
-        long currentPrefixSum = prefixSum + node.val;
-        int totalCount = map.getOrDefault(currentPrefixSum - targetSum, 0);
-        map.put(currentPrefixSum, map.getOrDefault(currentPrefixSum, 0) + 1);
+        long currentSum = parentSum + node.val;
+        int pathCount = prefixSumFrequency.getOrDefault(currentSum - targetSum, 0);
+        prefixSumFrequency.put(currentSum, prefixSumFrequency.getOrDefault(currentSum, 0) + 1);
+        int leftCount = dfs(node.left, currentSum, targetSum, prefixSumFrequency);
+        int rightCount = dfs(node.right, currentSum, targetSum, prefixSumFrequency);
 
-        int leftResult = dfs(node.left, currentPrefixSum, targetSum, map);
-        int rightResult = dfs(node.right, currentPrefixSum, targetSum, map);
+        pathCount += leftCount + rightCount;
 
-        totalCount += leftResult + rightResult;
-
-        int count = map.get(currentPrefixSum);
-        if (count == 1) {
-            map.remove(currentPrefixSum);
+        int frequency = prefixSumFrequency.get(currentSum);
+        if (frequency == 1) {
+            prefixSumFrequency.remove(currentSum);
         } else {
-            map.put(currentPrefixSum, count - 1);
+            prefixSumFrequency.put(currentSum, frequency - 1);
         }
 
-        return totalCount;
+        return pathCount;
     }
 
     /**
