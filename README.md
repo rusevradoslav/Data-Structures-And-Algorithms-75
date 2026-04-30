@@ -1401,7 +1401,7 @@ private void collectLeafs(TreeNode treeNode, List<Integer> list) {
 
 ### 3. Count Good Nodes in Binary Tree
 
-**Approach:** Recursive DFS — pass the maximum value seen so far down each path. A node is good if its value is greater than or equal to that maximum. Collect good node values into a list and return its size.
+**Approach:** Recursive DFS — pass the maximum value seen so far down each path. A node is good if its value is greater than or equal to that maximum. Return the count directly from each call — 1 if good, 0 otherwise, plus the counts from both subtrees.
 
 **Time Complexity:** O(n) — each node is visited exactly once.
 
@@ -1409,24 +1409,22 @@ private void collectLeafs(TreeNode treeNode, List<Integer> list) {
 
 **Pattern:** [Recursive DFS](#recursive-dfs) — propagate path state (running max) downward and aggregate results on the way back up.
 
-**Key Insight:** The root is always good since it has no ancestors. The path maximum is seeded with `root.val`, so the first comparison `node.val >= val` evaluates to `root.val >= root.val`, which is always true.
+**Key Insight:** The root is always good since it has no ancestors. The path maximum is seeded with `root.val`, so the first comparison `node.val >= maxSoFar` evaluates to `root.val >= root.val`, which is always true.
 
 **Code:**
 ```java
 public int goodNodes(TreeNode root) {
     if (Objects.isNull(root)) return 0;
-    List<Integer> goodNodes = new ArrayList<>();
-    countGoodNodes(root, root.val, goodNodes);
-    return goodNodes.size();
+    return countGoodNodes(root, root.val);
 }
 
-private void countGoodNodes(TreeNode node, int val, List<Integer> goodNodes) {
-    if (node.val >= val) {
-        goodNodes.add(node.val);
-        val = node.val;
-    }
-    if (Objects.nonNull(node.left)) countGoodNodes(node.left, val, goodNodes);
-    if (Objects.nonNull(node.right)) countGoodNodes(node.right, val, goodNodes);
+private int countGoodNodes(TreeNode node, int maxSoFar) {
+    if (Objects.isNull(node)) return 0;
+    int count = node.val >= maxSoFar ? 1 : 0;
+    maxSoFar = Math.max(maxSoFar, node.val);
+    count += countGoodNodes(node.left, maxSoFar);
+    count += countGoodNodes(node.right, maxSoFar);
+    return count;
 }
 ```
 

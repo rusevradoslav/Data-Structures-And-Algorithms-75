@@ -2,8 +2,6 @@ package org.example.j_tree.task.binary_tree_dfs;
 
 import org.example.j_tree.task.TreeNode;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -16,8 +14,9 @@ import java.util.Objects;
  * <p><b>Approach — Recursive DFS:</b>
  * <ul>
  *   <li>Pass the maximum value seen so far ({@code maxSoFar}) down each path</li>
- *   <li>A node is good if {@code node.val >= maxSoFar}</li>
- *   <li>Accumulate results by collecting good node values into a list and returning its size</li>
+ *   <li>A node is good if {@code node.val >= maxSoFar}; update {@code maxSoFar} when true</li>
+ *   <li>Return the count directly — 1 if the current node is good, 0 otherwise, plus the
+ *       counts returned from the left and right subtrees</li>
  * </ul>
  *
  * <p>Example:
@@ -46,22 +45,17 @@ public class CountGoodNodesInBinary {
             return 1;
         }
 
-        List<Integer> goodNodes = new ArrayList<>();
-        countGoodNodes(root, root.val, goodNodes);
-        return goodNodes.size();
+        return countGoodNodes(root, root.val);
     }
 
-    private void countGoodNodes(TreeNode node, int val, List<Integer> goodNodes) {
-        if (node.val >= val) {
-            goodNodes.add(node.val);
-            val = node.val;
+    private int countGoodNodes(TreeNode node, int maxSoFar) {
+        if (Objects.isNull(node)) {
+            return 0;
         }
-
-        if (Objects.nonNull(node.left)) {
-            countGoodNodes(node.left, val, goodNodes);
-        }
-        if (Objects.nonNull(node.right)) {
-            countGoodNodes(node.right, val, goodNodes);
-        }
+        int count = node.val >= maxSoFar ? 1 : 0;
+        maxSoFar = Math.max(maxSoFar, node.val);
+        count += countGoodNodes(node.left, maxSoFar);
+        count += countGoodNodes(node.right, maxSoFar);
+        return count;
     }
 }
