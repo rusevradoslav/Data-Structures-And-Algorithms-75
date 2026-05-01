@@ -1509,7 +1509,11 @@ private int dfs(TreeNode node, long prefixSum, int targetSum, Map<Long, Integer>
 
 ### 5. Longest ZigZag Path in a Binary Tree
 
-**Approach:** Recursive DFS — pass the arrival direction (`isLeft`) and current zigzag length down at each step. One child continues the zigzag (`length + 1`), the other resets it (`length = 1`). When a null node is reached, the path ended at its parent, so return `length - 1`.
+---
+
+#### Approach 1: Direction Flag — O(n)
+
+Pass the arrival direction (`isLeft`) and current zigzag length down at each step. One child continues the zigzag (`length + 1`), the other resets it (`length = 1`). When a null node is reached, the path ended at its parent, so return `length - 1`.
 
 **Time Complexity:** O(n) — each node is visited exactly once.
 
@@ -1533,6 +1537,45 @@ private int dfs(TreeNode node, boolean isLeft, int length) {
     return Math.max(dfs(node.left, true, leftLength), dfs(node.right, false, rightLength));
 }
 ```
+
+---
+
+#### Approach 2: Dual Lengths — O(n)
+
+Instead of a direction flag, pass two lengths simultaneously — one per direction. Going left always passes `rightLen + 1` as the child's left length and resets `rightLen` to 0; going right does the mirror. A global `result` field is updated at every node.
+
+**Time Complexity:** O(n) — each node is visited exactly once.
+
+**Space Complexity:** O(h) — recursion stack depth, where h is the tree height (O(log n) balanced, O(n) skewed).
+
+**Pattern:** [Recursive DFS](#recursive-dfs) — propagate two independent path lengths downward and track the global maximum as you go.
+
+**Key Insight:** No direction flag needed. Going left always uses `rightLen + 1` (opposite extends), and resets the other to 0 (same direction resets). This eliminates the ternary conditions and the `length - 1` at null.
+
+**Code:**
+```java
+private int result = 0;
+
+public int longestZigZagV2(TreeNode root) {
+    result = 0;
+    dfsV2(root, 0, 0);
+    return result;
+}
+
+private void dfsV2(TreeNode node, int leftLen, int rightLen) {
+    if (Objects.isNull(node)) return;
+    result = Math.max(result, Math.max(leftLen, rightLen));
+    dfsV2(node.left,  rightLen + 1, 0);
+    dfsV2(node.right, 0, leftLen + 1);
+}
+```
+
+| | Approach 1 | Approach 2 |
+|---|---|---|
+| Tracks | direction flag + one length | two lengths |
+| Reset logic | ternary `isLeft ? 1 : length + 1` | always `0` |
+| Null case | `return length - 1` | just `return` |
+| Global max | bubbled up via `Math.max` | tracked in `result` field |
 
 ---
 
