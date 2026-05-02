@@ -5,199 +5,320 @@ import org.example.j_tree.binary_tree.BinaryTreeNode;
 import java.util.*;
 
 /**
- * Binary Search Tree (BST) operations: search, insert, delete, min/max lookup,
- * BST validation, and inorder traversal.
+ * A generic Binary Search Tree supporting standard BST operations.
  *
- * <p>BST property: for every node N, all values in the left subtree are strictly
- * less than {@code N.val}, and all values in the right subtree are strictly greater.
+ * <p>All operations assume the tree satisfies the BST invariant: for every node N,
+ * all values in N's left subtree are strictly less than N.val, and all values in
+ * N's right subtree are strictly greater. Duplicate values are ignored on insert.
  *
- * <p><b>Operations:</b>
- * <ul>
- *   <li>{@link #search} — walk left if target &lt; current, right if target &gt; current</li>
- *   <li>{@link #insert} — same navigation as search; insert at the first null slot</li>
- *   <li>{@link #delete} — three cases: leaf, one child, two children (replace with inorder successor)</li>
- *   <li>{@link #findMin} — follow left children to the leftmost node</li>
- *   <li>{@link #findMax} — follow right children to the rightmost node</li>
- *   <li>{@link #isValidBST} — DFS with a valid range [min, max] narrowed at each step</li>
- *   <li>{@link #inorder} — Left → Root → Right; produces sorted ascending output for a valid BST</li>
- * </ul>
- *
- * <p>Example tree (insert order: 8, 3, 12, 1, 6, 9, 15):
- * <pre>
- *         8
- *        / \
- *       3   12
- *      / \  / \
- *     1   6 9  15
- *
- * Inorder: [1, 3, 6, 8, 9, 12, 15]
- * </pre>
- *
- * <p>Time Complexity: O(h) per operation — O(log n) for a balanced tree, O(n) worst case.
- *
- * <p>Space Complexity: O(h) — recursion stack depth, where h is the tree height.
+ * @param <E> the element type, which must be {@link Comparable}
  */
 public class BinarySearchTree<E extends Comparable<E>> {
 
+    /**
+     * Searches for {@code value} in the BST rooted at {@code node}.
+     *
+     * @param node  the root of the (sub)tree to search
+     * @param value the value to find
+     * @return the node whose val equals {@code value}, or {@code null} if not found
+     */
     public BinaryTreeNode<E> search(BinaryTreeNode<E> node, E value) {
-        if (Objects.isNull(node)) {
-            return null;
+        while (Objects.nonNull(node)) {
+            int comparingResult = value.compareTo(node.val);
+            if (comparingResult < 0) {
+                node = node.left;
+            } else if (comparingResult > 0) {
+                node = node.right;
+            } else {
+                return node;
+            }
         }
-        int cmp = value.compareTo(node.val);
-        if (cmp == 0) {
-            return node;
-        }
-        if (cmp < 0) {
-            return search(node.left, value);
-        }
-        return search(node.right, value);
+
+        return null;
     }
 
+    /**
+     * Inserts {@code value} into the BST rooted at {@code node}.
+     *
+     * <p>If {@code node} is {@code null} a new single-node tree is returned.
+     * Duplicate values are silently ignored.
+     *
+     * @param node  the root of the (sub)tree to insert into
+     * @param value the value to insert
+     * @return the root of the updated tree
+     */
     public BinaryTreeNode<E> insert(BinaryTreeNode<E> node, E value) {
         if (Objects.isNull(node)) {
             return new BinaryTreeNode<>(value);
         }
 
-        int cmp = value.compareTo(node.val);
-        if (cmp < 0) {
+        int comparingResult = value.compareTo(node.val);
+
+        if (comparingResult < 0) {
             node.left = insert(node.left, value);
-        } else {
+        } else if (comparingResult > 0) {
             node.right = insert(node.right, value);
         }
+
         return node;
     }
 
     /**
-     * Removes the node with the given value from the BST and returns the updated root.
+     * Deletes the node with {@code value} from the BST rooted at {@code node}.
      *
-     * <p><b>Navigation:</b> compare {@code value} to {@code node.val} and recurse left or right
-     * until the target node is found. If {@code node} is {@code null}, the value is not in the
-     * tree — return {@code null}.
+     * <p>Handles three cases:
+     * <ol>
+     *   <li>Leaf node — simply removed.</li>
+     *   <li>One child — replaced by that child.</li>
+     *   <li>Two children — replaced by its inorder successor (minimum of right subtree),
+     *       then the successor is deleted from the right subtree.</li>
+     * </ol>
+     * If {@code value} is not present the tree is returned unchanged.
      *
-     * <p><b>Case 1 — leaf node (no children):</b>
-     * <ul>
-     *   <li>Both {@link BinaryTreeNode#left} and {@link BinaryTreeNode#right} are {@code null}</li>
-     *   <li>Return {@code null} to detach the node from its parent</li>
-     * </ul>
-     *
-     * <p><b>Case 2 — one child:</b>
-     * <ul>
-     *   <li>Return the surviving child so the parent links directly to it, skipping the deleted node</li>
-     * </ul>
-     *
-     * <p><b>Case 3 — two children:</b>
-     * <ul>
-     *   <li>Find the inorder successor: the smallest value in the right subtree ({@link #findMin})</li>
-     *   <li>Copy that value into the current node</li>
-     *   <li>Recursively delete the inorder successor from the right subtree</li>
-     * </ul>
-     *
-     * <p>Example — delete 3 (case 3, inorder successor is 6):
-     * <pre>
-     *     Before          After
-     *       8               8
-     *      / \             / \
-     *     3   12    →     6   12
-     *    / \  / \        /   / \
-     *   1   6 9  15     1   9  15
-     * </pre>
+     * @param node  the root of the (sub)tree to delete from
+     * @param value the value to delete
+     * @return the root of the updated tree
      */
     public BinaryTreeNode<E> delete(BinaryTreeNode<E> node, E value) {
         if (Objects.isNull(node)) {
             return null;
         }
-        int cmp = value.compareTo(node.val);
-        if (cmp < 0) {
+
+        int comparingResult = value.compareTo(node.val);
+        if (comparingResult < 0) {
             node.left = delete(node.left, value);
-        } else if (cmp > 0) {
+        } else if (comparingResult > 0) {
             node.right = delete(node.right, value);
         } else {
+
             if (Objects.isNull(node.left)) {
                 return node.right;
             }
             if (Objects.isNull(node.right)) {
                 return node.left;
             }
-            E minElementFromRightTree = findMin(node.right);
-            node.val = minElementFromRightTree;
-            node.right = delete(node.right, minElementFromRightTree);
+
+            E minValue = findMin(node.right);
+            node.val = minValue;
+            node.right = delete(node.right, minValue);
         }
 
         return node;
     }
 
+    /**
+     * Finds the inorder successor of {@code value} in the BST rooted at {@code root}.
+     *
+     * <p>The inorder successor is the node with the smallest value strictly greater
+     * than {@code value}. The search does not require {@code value} to exist in the tree.
+     *
+     * @param root  the root of the BST
+     * @param value the reference value
+     * @return the node containing the inorder successor, or {@code null} if none exists
+     */
+    public BinaryTreeNode<E> findInorderSuccessor(BinaryTreeNode<E> root, E value) {
+        BinaryTreeNode<E> successor = null;
+        while (Objects.nonNull(root)) {
+            int comparingResult = value.compareTo(root.val);
+            if (comparingResult < 0) {
+                successor = root;
+                root = root.left;
+            } else {
+                root = root.right;
+            }
+        }
+        return successor;
+    }
+
+    /**
+     * Finds the inorder predecessor of {@code value} in the BST rooted at {@code root}.
+     *
+     * <p>The inorder predecessor is the node with the largest value strictly less
+     * than {@code value}. The search does not require {@code value} to exist in the tree.
+     *
+     * @param root  the root of the BST
+     * @param value the reference value
+     * @return the node containing the inorder predecessor, or {@code null} if none exists
+     */
+    public BinaryTreeNode<E> findInorderPredecessor(BinaryTreeNode<E> root, E value) {
+        BinaryTreeNode<E> predecessor = null;
+        while (Objects.nonNull(root)) {
+            int comparingResult = value.compareTo(root.val);
+            if (comparingResult > 0) {
+                predecessor = root;
+                root = root.right;
+            } else {
+                root = root.left;
+            }
+        }
+        return predecessor;
+    }
+
+    /**
+     * Returns the minimum value in the BST rooted at {@code node}.
+     *
+     * @param node the root of the (sub)tree
+     * @return the minimum value, or {@code null} if {@code node} is {@code null}
+     */
     public E findMin(BinaryTreeNode<E> node) {
+        if (Objects.isNull(node)) {
+            return null;
+        }
         while (Objects.nonNull(node.left)) {
             node = node.left;
         }
         return node.val;
     }
 
-    public E findMax(BinaryTreeNode<E> root) {
-        while (Objects.nonNull(root.right)) {
-            root = root.right;
-        }
-        return root.val;
-    }
-
-    public boolean isValidBST(BinaryTreeNode<E> root) {
-        List<E> result = inorderRecursively(root);
-        for (int i = 0; i < result.size() - 1; i++) {
-            if (result.get(i).compareTo(result.get(i + 1)) > 0) {
-                return false;
-            }
-
-        }
-        return true;
-    }
-
-    public List<E> inorderRecursively(BinaryTreeNode<E> root) {
-        if (Objects.isNull(root)) {
-            return Collections.emptyList();
-        }
-        if (Objects.isNull(root.left) && Objects.isNull(root.right)) {
-            return Collections.singletonList(root.val);
-        }
-        List<E> list = new ArrayList<>();
-        collectValues(root, list);
-        return list;
-    }
-
-    public List<E> inorderIteratively(BinaryTreeNode<E> node) {
+    /**
+     * Returns the maximum value in the BST rooted at {@code node}.
+     *
+     * @param node the root of the (sub)tree
+     * @return the maximum value, or {@code null} if {@code node} is {@code null}
+     */
+    public E findMax(BinaryTreeNode<E> node) {
         if (Objects.isNull(node)) {
-            return Collections.emptyList();
+            return null;
         }
-        if (Objects.isNull(node.left) && Objects.isNull(node.right)) {
-            return Collections.singletonList(node.val);
+        while (Objects.nonNull(node.right)) {
+            node = node.right;
         }
-
-        List<E> list = new ArrayList<>();
-        Deque<BinaryTreeNode<E>> stack = new ArrayDeque<>();
-        BinaryTreeNode<E> tempNode = node;
-
-        while (Objects.nonNull(tempNode) || !stack.isEmpty()) {
-            while (Objects.nonNull(tempNode)) {
-                stack.push(tempNode);
-                tempNode = tempNode.left;
-            }
-
-            BinaryTreeNode<E> element = stack.pop();
-            list.add(element.val);
-            tempNode = element.right;
-        }
-
-        return list;
+        return node.val;
     }
 
-    private void collectValues(BinaryTreeNode<E> root, List<E> list) {
-        if (Objects.nonNull(root.left)) {
-            collectValues(root.left, list);
+    /**
+     * Returns the node with the largest value less than or equal to {@code value}
+     * (the "floor") in the BST rooted at {@code node}.
+     *
+     * @param node  the root of the BST
+     * @param value the query value
+     * @return the floor node, or {@code null} if all values in the tree exceed {@code value}
+     */
+    public BinaryTreeNode<E> floor(BinaryTreeNode<E> node, E value) {
+        BinaryTreeNode<E> floorNode = null;
+        while (Objects.nonNull(node)) {
+            int comparingResult = value.compareTo(node.val);
+            if (comparingResult == 0) {
+                floorNode = node;
+                break;
+            }
+            if (comparingResult < 0) {
+                node = node.left;
+            } else {
+                floorNode = node;
+                node = node.right;
+            }
+        }
+        return floorNode;
+    }
+
+    /**
+     * Returns the node with the smallest value greater than or equal to {@code value}
+     * (the "ceiling") in the BST rooted at {@code node}.
+     *
+     * @param node  the root of the BST
+     * @param value the query value
+     * @return the ceiling node, or {@code null} if all values in the tree are below {@code value}
+     */
+    public BinaryTreeNode<E> ceiling(BinaryTreeNode<E> node, E value) {
+        BinaryTreeNode<E> ceilingNode = null;
+        while (Objects.nonNull(node)) {
+            int comparingResult = value.compareTo(node.val);
+            if (comparingResult == 0) {
+                ceilingNode = node;
+                break;
+            }
+
+            if (comparingResult < 0) {
+                ceilingNode = node;
+                node = node.left;
+            } else {
+                node = node.right;
+            }
+        }
+        return ceilingNode;
+    }
+
+    /**
+     * Returns {@code true} if the tree rooted at {@code node} is a valid BST.
+     *
+     * <p>Validates the global BST invariant by propagating min/max bounds through
+     * the recursion, catching cases that are locally valid but globally invalid.
+     *
+     * @param node the root of the tree to validate
+     * @return {@code true} if the tree satisfies the BST property, {@code false} otherwise
+     */
+    public boolean isValidBST(BinaryTreeNode<E> node) {
+        return isValid(node, null, null);
+    }
+
+    private boolean isValid(BinaryTreeNode<E> node, E min, E max) {
+        if (Objects.isNull(node)) {
+            return true;
+        }
+        if (Objects.nonNull(min) && node.val.compareTo(min) <= 0) {
+            return false;
+        }
+        if (Objects.nonNull(max) && node.val.compareTo(max) >= 0) {
+            return false;
         }
 
-        list.add(root.val);
+        return isValid(node.left, min, node.val) &&
+                isValid(node.right, node.val, max);
+    }
 
-        if (Objects.nonNull(root.right)) {
-            collectValues(root.right, list);
+    /**
+     * Returns the values of the BST rooted at {@code node} in ascending (inorder) order,
+     * using a recursive traversal.
+     *
+     * @param node the root of the BST
+     * @return a list of values in sorted ascending order; empty list if {@code node} is {@code null}
+     */
+    public List<E> inorderRecursively(BinaryTreeNode<E> node) {
+        List<E> elements = new ArrayList<>();
+
+        if (Objects.isNull(node)) {
+            return elements;
         }
+        collectElementsRecursively(elements, node);
+        return elements;
+    }
+
+    private void collectElementsRecursively(List<E> elements, BinaryTreeNode<E> node) {
+        if (Objects.isNull(node)) {
+            return;
+        }
+        collectElementsRecursively(elements, node.left);
+        elements.add(node.val);
+        collectElementsRecursively(elements, node.right);
+    }
+
+    /**
+     * Returns the values of the BST rooted at {@code node} in ascending (inorder) order,
+     * using an iterative traversal with an explicit stack.
+     *
+     * @param node the root of the BST
+     * @return a list of values in sorted ascending order; empty list if {@code node} is {@code null}
+     */
+    public List<E> inorderIteratively(BinaryTreeNode<E> node) {
+        List<E> elements = new ArrayList<>();
+
+        if (Objects.isNull(node)) {
+            return elements;
+        }
+
+        Deque<BinaryTreeNode<E>> stack = new ArrayDeque<>();
+        BinaryTreeNode<E> current = node;
+        while (Objects.nonNull(current) || !stack.isEmpty()) {
+            while (Objects.nonNull(current)) {
+                stack.push(current);
+                current = current.left;
+            }
+            BinaryTreeNode<E> lastNode = stack.pop();
+            elements.add(lastNode.val);
+            current = lastNode.right;
+        }
+
+        return elements;
     }
 }

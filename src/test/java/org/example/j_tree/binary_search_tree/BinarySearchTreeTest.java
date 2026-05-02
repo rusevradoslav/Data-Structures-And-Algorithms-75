@@ -172,6 +172,114 @@ public class BinarySearchTreeTest {
         assertEquals(5, bst.findMax(new BinaryTreeNode<>(5)));
     }
 
+    // --- findMin null check ---
+
+    @Test
+    @DisplayName("findMin on null tree returns null")
+    public void testFindMinNullTree() {
+        assertNull(bst.findMin(null));
+    }
+
+    // --- findMax null check ---
+
+    @Test
+    @DisplayName("findMax on null tree returns null")
+    public void testFindMaxNullTree() {
+        assertNull(bst.findMax(null));
+    }
+
+    // --- findInorderSuccessor ---
+
+    @Test
+    @DisplayName("Inorder successor of 8 (root) is 9")
+    public void testInorderSuccessorOfRoot() {
+        assertEquals(9, bst.findInorderSuccessor(root, 8).val);
+    }
+
+    @Test
+    @DisplayName("Inorder successor of 6 is 8 (ancestor)")
+    public void testInorderSuccessorAncestor() {
+        assertEquals(8, bst.findInorderSuccessor(root, 6).val);
+    }
+
+    @Test
+    @DisplayName("Inorder successor of 1 is 3")
+    public void testInorderSuccessorLeaf() {
+        assertEquals(3, bst.findInorderSuccessor(root, 1).val);
+    }
+
+    @Test
+    @DisplayName("Inorder successor of 15 (max) is null")
+    public void testInorderSuccessorOfMax() {
+        assertNull(bst.findInorderSuccessor(root, 15));
+    }
+
+    // --- findInorderPredecessor ---
+
+    @Test
+    @DisplayName("Inorder predecessor of 9 is 8 (root)")
+    public void testInorderPredecessorOfNine() {
+        assertEquals(8, bst.findInorderPredecessor(root, 9).val);
+    }
+
+    @Test
+    @DisplayName("Inorder predecessor of 8 (root) is 6")
+    public void testInorderPredecessorOfRoot() {
+        assertEquals(6, bst.findInorderPredecessor(root, 8).val);
+    }
+
+    @Test
+    @DisplayName("Inorder predecessor of 15 is 12")
+    public void testInorderPredecessorLeaf() {
+        assertEquals(12, bst.findInorderPredecessor(root, 15).val);
+    }
+
+    @Test
+    @DisplayName("Inorder predecessor of 1 (min) is null")
+    public void testInorderPredecessorOfMin() {
+        assertNull(bst.findInorderPredecessor(root, 1));
+    }
+
+    // --- floor ---
+
+    @Test
+    @DisplayName("Floor of 7 (between 6 and 8) is 6")
+    public void testFloorBetweenValues() {
+        assertEquals(6, bst.floor(root, 7).val);
+    }
+
+    @Test
+    @DisplayName("Floor of exact match 9 is 9")
+    public void testFloorExactMatch() {
+        assertEquals(9, bst.floor(root, 9).val);
+    }
+
+    @Test
+    @DisplayName("Floor of 0 (smaller than all values) is null")
+    public void testFloorSmallerThanAll() {
+        assertNull(bst.floor(root, 0));
+    }
+
+    // --- ceiling ---
+
+    @Test
+    @DisplayName("Ceiling of 7 (between 6 and 8) is 8")
+    public void testCeilingBetweenValues() {
+        assertEquals(8, bst.ceiling(root, 7).val);
+    }
+
+    @Test
+    @DisplayName("Ceiling of exact match 9 is 9")
+    public void testCeilingExactMatch() {
+        assertEquals(9, bst.ceiling(root, 9).val);
+    }
+
+    @Test
+    @DisplayName("Ceiling of 16 (larger than all values) is null")
+    public void testCeilingLargerThanAll() {
+        assertNull(bst.ceiling(root, 16));
+    }
+
     // --- isValidBST ---
 
     @Test
