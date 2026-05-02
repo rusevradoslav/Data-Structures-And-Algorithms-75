@@ -11,12 +11,12 @@ import java.util.Objects;
  * {@code val} and return the subtree rooted at that node. If no such node exists, return
  * {@code null}.
  *
- * <p><b>Approach — Recursive BST navigation:</b>
+ * <p><b>Approach — Iterative BST navigation:</b>
  * <ul>
  *   <li>If {@code root} is {@code null}, the value is not in the tree — return {@code null}</li>
  *   <li>If {@code root.val == val}, return {@code root} (the entire subtree rooted here)</li>
- *   <li>If {@code val < root.val}, recurse into the left subtree</li>
- *   <li>If {@code val > root.val}, recurse into the right subtree</li>
+ *   <li>If {@code val < root.val}, move to the left child</li>
+ *   <li>If {@code val > root.val}, move to the right child</li>
  * </ul>
  *
  * <p>Example:
@@ -37,16 +37,18 @@ import java.util.Objects;
 public class SearchInABinarySearchTree {
 
     public TreeNode searchBST(TreeNode root, int val) {
-        if (Objects.isNull(root)) {
-            return null;
+        TreeNode resultNode = null;
+        while (Objects.nonNull(root)) {
+            if (Objects.equals(root.val, val)) {
+                resultNode = root;
+                break;
+            }
+            if (val < root.val) {
+                root = root.left;
+            } else {
+                root = root.right;
+            }
         }
-        if (root.val == val) {
-            return root;
-        }
-        if (val < root.val) {
-            return searchBST(root.left, val);
-        }
-
-        return searchBST(root.right, val);
+        return resultNode;
     }
 }
