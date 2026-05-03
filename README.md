@@ -1709,6 +1709,7 @@ public int maxLevelSum(TreeNode root) {
 |---|---------|------------|------|-------|---------|
 | 1 | [Search in a Binary Search Tree](#1-search-in-a-binary-search-tree) | Easy | O(h) | O(h) | [BST Navigation](#bst-navigation) |
 | 2 | [Delete Node in a BST](#2-delete-node-in-a-bst) | Medium | O(h) | O(h) | [BST Navigation](#bst-navigation) |
+| 3 | [Minimum Absolute Difference in BST](#3-minimum-absolute-difference-in-bst) | Easy | O(n) | O(h) | [Inorder Traversal](#bst-navigation) |
 
 ---
 
@@ -1764,6 +1765,18 @@ public TreeNode deleteNode(TreeNode root, int key) {
     return root;
 }
 ```
+
+### 3. Minimum Absolute Difference in BST
+
+**Approach:** Inorder traversal — BST inorder visits nodes in ascending sorted order, so the minimum absolute difference is always between two adjacent values in that sequence. Track a `previous` node pointer during traversal; compare each node with the previous one and update the minimum.
+
+**Time Complexity:** O(n) — each node is visited exactly once.
+
+**Space Complexity:** O(h) — recursion stack depth, where h is the tree height.
+
+**Pattern:** [BST Navigation](#bst-navigation) — exploit the BST inorder property to avoid comparing all pairs.
+
+**Key Insight:** `previous` must be a class-level field, not a parameter. Passing it as a parameter gives each recursive call its own copy, so sibling subtrees can't see each other's updates. A shared field persists the last visited node across the entire traversal.
 
 ---
 
