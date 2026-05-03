@@ -38,15 +38,14 @@ import java.util.Objects;
  */
 public class DeleteNodeInBst {
 
-    public TreeNode deleteNode(TreeNode root, int key) {
+    public TreeNode deleteNode(TreeNode root, int value) {
         if (Objects.isNull(root)) {
             return null;
         }
-
-        if (root.val < key) {
-            root.right = deleteNode(root.right, key);
-        } else if (root.val > key) {
-            root.left = deleteNode(root.left, key);
+        if (value < root.val) {
+            root.left = deleteNode(root.left, value);
+        } else if (value > root.val) {
+            root.right = deleteNode(root.right, value);
         } else {
             if (Objects.isNull(root.left)) {
                 return root.right;
@@ -54,17 +53,21 @@ public class DeleteNodeInBst {
             if (Objects.isNull(root.right)) {
                 return root.left;
             }
-            int minElement = findMinElement(root.right, key);
+            int minElement = findMinElement(root.right);
             root.val = minElement;
             root.right = deleteNode(root.right, minElement);
         }
         return root;
     }
 
-    private int findMinElement(TreeNode right, int key) {
-        while (Objects.nonNull(right.left)) {
-            right = right.left;
+    private int findMinElement(TreeNode root) {
+        if (Objects.isNull(root)) {
+            return -1;
         }
-        return right.val;
+        while (Objects.nonNull(root.left)) {
+            root = root.left;
+        }
+
+        return root.val;
     }
 }
