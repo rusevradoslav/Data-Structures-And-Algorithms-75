@@ -1711,6 +1711,7 @@ public int maxLevelSum(TreeNode root) {
 | 2 | [Delete Node in a BST](#2-delete-node-in-a-bst) | Medium | O(h) | O(h) | [BST Navigation](#bst-navigation) |
 | 3 | [Minimum Absolute Difference in BST](#3-minimum-absolute-difference-in-bst) | Easy | O(n) | O(h) | [Inorder Traversal](#bst-navigation) |
 | 4 | [Kth Smallest Element in a BST](#4-kth-smallest-element-in-a-bst) | Medium | O(h+k) | O(h) | [Inorder Traversal](#bst-navigation) |
+| 5 | [Validate Binary Search Tree](#5-validate-binary-search-tree) | Medium | O(n) | O(h) | [BST Navigation](#bst-navigation) |
 
 ---
 
@@ -1809,6 +1810,35 @@ private void findKthSmallestElement(TreeNode node, int k) {
         return;
     }
     findKthSmallestElement(node.right, k);
+}
+```
+
+---
+
+### 5. Validate Binary Search Tree
+
+**Approach:** Recursive bounds propagation — each node is validated against a valid range `(min, max)`. Going left tightens the upper bound to the current node's value; going right tightens the lower bound. A `null` bound means no constraint on that side.
+
+**Time Complexity:** O(n) — every node is visited exactly once.
+
+**Space Complexity:** O(h) — recursion stack depth, where h is the tree height.
+
+**Pattern:** [BST Navigation](#bst-navigation) — propagate structural constraints down the tree rather than comparing only with direct parents.
+
+**Key Insight:** Comparing a node only with its parent is not enough. A node in the right subtree must be greater than every ancestor above it, not just its own parent. Passing `(min, max)` bounds ensures the global BST property is enforced at every node.
+
+**Code:**
+```java
+public boolean isValidBST(TreeNode root) {
+    if (root == null) return false;
+    return validate(root, null, null);
+}
+
+private boolean validate(TreeNode node, Integer min, Integer max) {
+    if (node == null) return true;
+    if (min != null && node.val <= min) return false;
+    if (max != null && node.val >= max) return false;
+    return validate(node.left, min, node.val) && validate(node.right, node.val, max);
 }
 ```
 
