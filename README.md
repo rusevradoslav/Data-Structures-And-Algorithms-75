@@ -1710,6 +1710,7 @@ public int maxLevelSum(TreeNode root) {
 | 1 | [Search in a Binary Search Tree](#1-search-in-a-binary-search-tree) | Easy | O(h) | O(h) | [BST Navigation](#bst-navigation) |
 | 2 | [Delete Node in a BST](#2-delete-node-in-a-bst) | Medium | O(h) | O(h) | [BST Navigation](#bst-navigation) |
 | 3 | [Minimum Absolute Difference in BST](#3-minimum-absolute-difference-in-bst) | Easy | O(n) | O(h) | [Inorder Traversal](#bst-navigation) |
+| 4 | [Kth Smallest Element in a BST](#4-kth-smallest-element-in-a-bst) | Medium | O(h+k) | O(h) | [Inorder Traversal](#bst-navigation) |
 
 ---
 
@@ -1777,6 +1778,39 @@ public TreeNode deleteNode(TreeNode root, int key) {
 **Pattern:** [BST Navigation](#bst-navigation) — exploit the BST inorder property to avoid comparing all pairs.
 
 **Key Insight:** `previous` must be a class-level field, not a parameter. Passing it as a parameter gives each recursive call its own copy, so sibling subtrees can't see each other's updates. A shared field persists the last visited node across the entire traversal.
+
+---
+
+### 4. Kth Smallest Element in a BST
+
+**Approach:** Inorder traversal with counter — BST inorder visits nodes in ascending sorted order, so the k-th node visited is the k-th smallest. A class-level `count` is incremented on each visit; when it reaches `k`, the current node's value is captured.
+
+**Time Complexity:** O(h + k) — traverses at most h + k nodes before finding the answer.
+
+**Space Complexity:** O(h) — recursion stack depth, where h is the tree height.
+
+**Pattern:** [BST Navigation](#bst-navigation) — exploit BST inorder order to avoid sorting or collecting all values.
+
+**Key Insight:** `count` must be reset to 0 at the start of each call. Because `count` is a class-level field (needed so it persists across recursive frames), it retains its value between separate `kthSmallest` calls on the same instance. Without the reset, a second call starts counting from where the first one stopped.
+
+**Code:**
+```java
+public int kthSmallest(TreeNode root, int k) {
+    count = 0;
+    findKthSmallestElement(root, k);
+    return smallest;
+}
+
+private void findKthSmallestElement(TreeNode node, int k) {
+    if (node == null) return;
+    findKthSmallestElement(node.left, k);
+    if (++count == k) {
+        smallest = node.val;
+        return;
+    }
+    findKthSmallestElement(node.right, k);
+}
+```
 
 ---
 
