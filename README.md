@@ -1181,11 +1181,13 @@ return radiantQueue.isEmpty() ? "Dire" : "Radiant";
 
 **Code:**
 ```java
-if (head.next == null) return null;
+if (Objects.isNull(head.next)) {
+    return null;
+}
 
 int counter = 1;
 ListNode node = head;
-while (node.next != null) {
+while (Objects.nonNull(node.next)) {
     node = node.next;
     counter++;
 }
@@ -1216,13 +1218,15 @@ return head;
 
 **Code:**
 ```java
-if (head == null || head.next == null) return head;
+if (Objects.isNull(head) || Objects.isNull(head.next)) {
+    return head;
+}
 
 ListNode odd = head;
 ListNode even = head.next;
 ListNode evenHead = even;
 
-while (even != null && even.next != null) {
+while (Objects.nonNull(even) && Objects.nonNull(even.next)) {
     odd.next = even.next;
     odd = odd.next;
 
@@ -1255,13 +1259,13 @@ return head;
 ArrayDeque<Integer> deque = new ArrayDeque<>();
 
 ListNode curr = head;
-while (curr != null) {
+while (Objects.nonNull(curr)) {
     deque.offerFirst(curr.val);
     curr = curr.next;
 }
 
 curr = head;
-while (curr != null) {
+while (Objects.nonNull(curr)) {
     curr.val = deque.poll();
     curr = curr.next;
 }
@@ -1274,7 +1278,7 @@ return head;
 ListNode prev = null;
 ListNode curr = head;
 
-while (curr != null) {
+while (Objects.nonNull(curr)) {
     ListNode next = curr.next;
     curr.next = prev;
     prev = curr;
@@ -1302,7 +1306,7 @@ return prev;
 ```java
 ArrayDeque<Integer> deque = new ArrayDeque<>();
 ListNode temp = head;
-while (temp != null) {
+while (Objects.nonNull(temp)) {
     deque.addLast(temp.val);
     temp = temp.next;
 }
@@ -1349,12 +1353,16 @@ return maxSum;
 **Code:**
 ```java
 public int maxDepth(TreeNode root) {
-    if (Objects.isNull(root)) return 0;
+    if (Objects.isNull(root)) {
+        return 0;
+    }
     return calculateDepth(root);
 }
 
 private int calculateDepth(TreeNode node) {
-    if (Objects.isNull(node)) return 0;
+    if (Objects.isNull(node)) {
+        return 0;
+    }
     int leftDepth = calculateDepth(node.left);
     int rightDepth = calculateDepth(node.right);
     return Math.max(leftDepth, rightDepth) + 1;
@@ -1378,7 +1386,9 @@ private int calculateDepth(TreeNode node) {
 **Code:**
 ```java
 public boolean leafSimilar(TreeNode root1, TreeNode root2) {
-    if (Objects.isNull(root1) && Objects.isNull(root2)) return true;
+    if (Objects.isNull(root1) && Objects.isNull(root2)) {
+        return true;
+    }
     List<Integer> firstList = new ArrayList<>();
     collectLeafs(root1, firstList);
 
@@ -1392,8 +1402,12 @@ private void collectLeafs(TreeNode treeNode, List<Integer> list) {
     if (Objects.isNull(treeNode.left) && Objects.isNull(treeNode.right)) {
         list.add(treeNode.val);
     }
-    if (Objects.nonNull(treeNode.left)) collectLeafs(treeNode.left, list);
-    if (Objects.nonNull(treeNode.right)) collectLeafs(treeNode.right, list);
+    if (Objects.nonNull(treeNode.left)) {
+        collectLeafs(treeNode.left, list);
+    }
+    if (Objects.nonNull(treeNode.right)) {
+        collectLeafs(treeNode.right, list);
+    }
 }
 ```
 
@@ -1414,12 +1428,16 @@ private void collectLeafs(TreeNode treeNode, List<Integer> list) {
 **Code:**
 ```java
 public int goodNodes(TreeNode root) {
-    if (Objects.isNull(root)) return 0;
+    if (Objects.isNull(root)) {
+        return 0;
+    }
     return countGoodNodes(root, root.val);
 }
 
 private int countGoodNodes(TreeNode node, int maxSoFar) {
-    if (Objects.isNull(node)) return 0;
+    if (Objects.isNull(node)) {
+        return 0;
+    }
     int count = node.val >= maxSoFar ? 1 : 0;
     maxSoFar = Math.max(maxSoFar, node.val);
     count += countGoodNodes(node.left, maxSoFar);
@@ -1449,19 +1467,25 @@ For every node in the tree, count all paths starting at that node going downward
 **Code:**
 ```java
 public int pathSumBruteForce(TreeNode root, int targetSum) {
-    if (Objects.isNull(root)) return 0;
+    if (Objects.isNull(root)) {
+        return 0;
+    }
     return countGoodPaths(root, targetSum);
 }
 
 private int countGoodPaths(TreeNode root, int targetSum) {
-    if (Objects.isNull(root)) return 0;
+    if (Objects.isNull(root)) {
+        return 0;
+    }
     return countFrom(root, targetSum)
          + countGoodPaths(root.left, targetSum)
          + countGoodPaths(root.right, targetSum);
 }
 
 private int countFrom(TreeNode node, long remaining) {
-    if (Objects.isNull(node)) return 0;
+    if (Objects.isNull(node)) {
+        return 0;
+    }
     if (remaining - node.val == 0) {
         return 1 + countFrom(node.left, 0) + countFrom(node.right, 0);
     }
@@ -1485,22 +1509,29 @@ A single DFS tracks the running prefix sum from root to the current node. At eac
 **Code:**
 ```java
 public int pathSum(TreeNode root, int targetSum) {
-    if (Objects.isNull(root)) return 0;
+    if (Objects.isNull(root)) {
+        return 0;
+    }
     Map<Long, Integer> map = new HashMap<>();
     map.put(0L, 1);
     return dfs(root, 0, targetSum, map);
 }
 
 private int dfs(TreeNode node, long prefixSum, int targetSum, Map<Long, Integer> map) {
-    if (Objects.isNull(node)) return 0;
+    if (Objects.isNull(node)) {
+        return 0;
+    }
     long currentPrefixSum = prefixSum + node.val;
     int totalCount = map.getOrDefault(currentPrefixSum - targetSum, 0);
     map.put(currentPrefixSum, map.getOrDefault(currentPrefixSum, 0) + 1);
     totalCount += dfs(node.left, currentPrefixSum, targetSum, map)
                + dfs(node.right, currentPrefixSum, targetSum, map);
     int count = map.get(currentPrefixSum);
-    if (count == 1) map.remove(currentPrefixSum);
-    else map.put(currentPrefixSum, count - 1);
+    if (count == 1) {
+        map.remove(currentPrefixSum);
+    } else {
+        map.put(currentPrefixSum, count - 1);
+    }
     return totalCount;
 }
 ```
@@ -1526,12 +1557,16 @@ Pass the arrival direction (`isLeft`) and current zigzag length down at each ste
 **Code:**
 ```java
 public int longestZigZag(TreeNode root) {
-    if (Objects.isNull(root)) return 0;
+    if (Objects.isNull(root)) {
+        return 0;
+    }
     return dfs(root, true, 0);
 }
 
 private int dfs(TreeNode node, boolean isLeft, int length) {
-    if (Objects.isNull(node)) return length - 1;
+    if (Objects.isNull(node)) {
+        return length - 1;
+    }
     int leftLength  = isLeft ? 1 : length + 1;
     int rightLength = isLeft ? length + 1 : 1;
     return Math.max(dfs(node.left, true, leftLength), dfs(node.right, false, rightLength));
@@ -1563,7 +1598,9 @@ public int longestZigZagV2(TreeNode root) {
 }
 
 private void dfsV2(TreeNode node, int leftLen, int rightLen) {
-    if (Objects.isNull(node)) return;
+    if (Objects.isNull(node)) {
+        return;
+    }
     result = Math.max(result, Math.max(leftLen, rightLen));
     dfsV2(node.left,  rightLen + 1, 0);
     dfsV2(node.right, 0, leftLen + 1);
@@ -1594,17 +1631,27 @@ private void dfsV2(TreeNode node, int leftLen, int rightLen) {
 **Code:**
 ```java
 public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
-    if (Objects.isNull(root)) return null;
-    if (Objects.equals(root.val, p.val) || Objects.equals(root.val, q.val)) return root;
+    if (Objects.isNull(root)) {
+        return null;
+    }
+    if (Objects.equals(root.val, p.val) || Objects.equals(root.val, q.val)) {
+        return root;
+    }
     return dfs(root, p, q);
 }
 
 private TreeNode dfs(TreeNode node, TreeNode p, TreeNode q) {
-    if (Objects.isNull(node)) return null;
-    if (Objects.equals(node.val, p.val) || Objects.equals(node.val, q.val)) return node;
+    if (Objects.isNull(node)) {
+        return null;
+    }
+    if (Objects.equals(node.val, p.val) || Objects.equals(node.val, q.val)) {
+        return node;
+    }
     TreeNode left  = dfs(node.left,  p, q);
     TreeNode right = dfs(node.right, p, q);
-    if (Objects.nonNull(left) && Objects.nonNull(right)) return node;
+    if (Objects.nonNull(left) && Objects.nonNull(right)) {
+        return node;
+    }
     return Objects.nonNull(left) ? left : right;
 }
 ```
@@ -1638,7 +1685,9 @@ private TreeNode dfs(TreeNode node, TreeNode p, TreeNode q) {
 ```java
 public List<Integer> rightSideView(TreeNode root) {
     List<Integer> res = new ArrayList<>();
-    if (Objects.isNull(root)) return res;
+    if (Objects.isNull(root)) {
+        return res;
+    }
 
     Deque<TreeNode> queue = new ArrayDeque<>();
     queue.offer(root);
@@ -1646,9 +1695,15 @@ public List<Integer> rightSideView(TreeNode root) {
         int size = queue.size();
         for (int i = 0; i < size; i++) {
             TreeNode node = queue.poll();
-            if (i == size - 1) res.add(node.val);
-            if (Objects.nonNull(node.left))  queue.offer(node.left);
-            if (Objects.nonNull(node.right)) queue.offer(node.right);
+            if (i == size - 1) {
+                res.add(node.val);
+            }
+            if (Objects.nonNull(node.left)) {
+                queue.offer(node.left);
+            }
+            if (Objects.nonNull(node.right)) {
+                queue.offer(node.right);
+            }
         }
     }
     return res;
@@ -1672,7 +1727,9 @@ public List<Integer> rightSideView(TreeNode root) {
 **Code:**
 ```java
 public int maxLevelSum(TreeNode root) {
-    if (Objects.isNull(root)) return 0;
+    if (Objects.isNull(root)) {
+        return 0;
+    }
 
     int result = 0;
     int maxSum = Integer.MIN_VALUE;
@@ -1686,8 +1743,12 @@ public int maxLevelSum(TreeNode root) {
         for (int i = 0; i < size; i++) {
             TreeNode node = queue.poll();
             tempSum += node.val;
-            if (Objects.nonNull(node.left))  queue.offer(node.left);
-            if (Objects.nonNull(node.right)) queue.offer(node.right);
+            if (Objects.nonNull(node.left)) {
+                queue.offer(node.left);
+            }
+            if (Objects.nonNull(node.right)) {
+                queue.offer(node.right);
+            }
         }
         if (tempSum > maxSum) {
             maxSum = tempSum;
@@ -1730,9 +1791,15 @@ public int maxLevelSum(TreeNode root) {
 **Code:**
 ```java
 public TreeNode searchBST(TreeNode root, int val) {
-    if (Objects.isNull(root)) return null;
-    if (root.val == val) return root;
-    if (val < root.val) return searchBST(root.left, val);
+    if (Objects.isNull(root)) {
+        return null;
+    }
+    if (root.val == val) {
+        return root;
+    }
+    if (val < root.val) {
+        return searchBST(root.left, val);
+    }
     return searchBST(root.right, val);
 }
 ```
@@ -1754,12 +1821,20 @@ public TreeNode searchBST(TreeNode root, int val) {
 **Code:**
 ```java
 public TreeNode deleteNode(TreeNode root, int key) {
-    if (Objects.isNull(root)) return null;
-    if (root.val < key) root.right = deleteNode(root.right, key);
-    else if (root.val > key) root.left = deleteNode(root.left, key);
-    else {
-        if (Objects.isNull(root.left)) return root.right;
-        if (Objects.isNull(root.right)) return root.left;
+    if (Objects.isNull(root)) {
+        return null;
+    }
+    if (root.val < key) {
+        root.right = deleteNode(root.right, key);
+    } else if (root.val > key) {
+        root.left = deleteNode(root.left, key);
+    } else {
+        if (Objects.isNull(root.left)) {
+            return root.right;
+        }
+        if (Objects.isNull(root.right)) {
+            return root.left;
+        }
         int successor = findMinElement(root.right);
         root.val = successor;
         root.right = deleteNode(root.right, successor);
@@ -1803,7 +1878,9 @@ public int kthSmallest(TreeNode root, int k) {
 }
 
 private void findKthSmallestElement(TreeNode node, int k) {
-    if (node == null) return;
+    if (Objects.isNull(node)) {
+        return;
+    }
     findKthSmallestElement(node.left, k);
     if (++count == k) {
         smallest = node.val;
@@ -1830,14 +1907,22 @@ private void findKthSmallestElement(TreeNode node, int k) {
 **Code:**
 ```java
 public boolean isValidBST(TreeNode root) {
-    if (root == null) return false;
+    if (Objects.isNull(root)) {
+        return false;
+    }
     return validate(root, null, null);
 }
 
 private boolean validate(TreeNode node, Integer min, Integer max) {
-    if (node == null) return true;
-    if (min != null && node.val <= min) return false;
-    if (max != null && node.val >= max) return false;
+    if (Objects.isNull(node)) {
+        return true;
+    }
+    if (Objects.nonNull(min) && node.val <= min) {
+        return false;
+    }
+    if (Objects.nonNull(max) && node.val >= max) {
+        return false;
+    }
     return validate(node.left, min, node.val) && validate(node.right, node.val, max);
 }
 ```
@@ -1855,7 +1940,9 @@ private boolean validate(TreeNode node, Integer min, Integer max) {
 **Template:**
 ```java
 void bfs(TreeNode root) {
-    if (root == null) return;
+    if (Objects.isNull(root)) {
+        return;
+    }
     Queue<TreeNode> queue = new ArrayDeque<>();
     queue.offer(root);
     while (!queue.isEmpty()) {
@@ -1863,8 +1950,12 @@ void bfs(TreeNode root) {
         for (int i = 0; i < size; i++) {
             TreeNode node = queue.poll();
             // process node (e.g. last node: i == size - 1)
-            if (node.left  != null) queue.offer(node.left);
-            if (node.right != null) queue.offer(node.right);
+            if (Objects.nonNull(node.left)) {
+                queue.offer(node.left);
+            }
+            if (Objects.nonNull(node.right)) {
+                queue.offer(node.right);
+            }
         }
     }
 }
@@ -1881,7 +1972,9 @@ void bfs(TreeNode root) {
 **Template:**
 ```java
 int dfs(TreeNode node) {
-    if (node == null) return BASE_VALUE;
+    if (Objects.isNull(node)) {
+        return BASE_VALUE;
+    }
 
     int left = dfs(node.left);
     int right = dfs(node.right);
@@ -1901,7 +1994,9 @@ int dfs(TreeNode node) {
 **Template:**
 ```java
 TreeNode dfs(TreeNode node) {
-    if (node == null) return null;
+    if (Objects.isNull(node)) {
+        return null;
+    }
     TreeNode left  = dfs(node.left);
     TreeNode right = dfs(node.right);
     // decide based on left and right results
@@ -1920,13 +2015,17 @@ TreeNode dfs(TreeNode node) {
 **Template:**
 ```java
 int dfs(TreeNode node, long prefixSum, int target, Map<Long, Integer> map) {
-    if (node == null) return 0;
+    if (Objects.isNull(node)) {
+        return 0;
+    }
     long current = prefixSum + node.val;
     int count = map.getOrDefault(current - target, 0);
     map.merge(current, 1, Integer::sum);
     count += dfs(node.left, current, target, map)
            + dfs(node.right, current, target, map);
-    if (map.merge(current, -1, Integer::sum) == 0) map.remove(current);
+    if (map.merge(current, -1, Integer::sum) == 0) {
+        map.remove(current);
+    }
     return count;
 }
 ```
@@ -1969,7 +2068,7 @@ ListNode odd = head;
 ListNode even = head.next;
 ListNode evenHead = even; // save before rewiring
 
-while (even != null && even.next != null) {
+while (Objects.nonNull(even) && Objects.nonNull(even.next)) {
     odd.next = even.next;   // link odd to next odd
     odd = odd.next;
 
@@ -2004,7 +2103,7 @@ while (fast < arr.length) {
 **Template (Linked List — Find Middle):**
 ```java
 ListNode slow = head, fast = head;
-while (fast.next != null && fast.next.next != null) {
+while (Objects.nonNull(fast.next) && Objects.nonNull(fast.next.next)) {
     slow = slow.next;       // 1 step
     fast = fast.next.next;  // 2 steps
 }
@@ -2274,7 +2373,7 @@ while (deque.size() > 1) {
 // Pass 1: count nodes
 int count = 0;
 ListNode node = head;
-while (node != null) {
+while (Objects.nonNull(node)) {
     node = node.next;
     count++;
 }
@@ -2302,7 +2401,7 @@ prev.next = prev.next.next; // skip target
 ListNode prev = null;
 ListNode curr = head;
 
-while (curr != null) {
+while (Objects.nonNull(curr)) {
     ListNode next = curr.next; // save next
     curr.next = prev;          // flip pointer
     prev = curr;               // advance prev
