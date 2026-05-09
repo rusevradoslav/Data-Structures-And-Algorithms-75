@@ -20,19 +20,19 @@ import java.util.Map;
  */
 public class Vertex<V, E> {
 
-    private V element;
+    private final V element;
 
     /**
      * Maps each out-neighbour to the edge leading to it.
      * For undirected graphs this is the same object as {@code incoming}.
      */
-    private Map<Vertex<V, E>, Edge<V, E>> outgoing;
+    private final Map<Vertex<V, E>, Edge<V, E>> outgoing;
 
     /**
      * Maps each in-neighbour to the edge coming from it.
      * For undirected graphs this is the same object as {@code outgoing}.
      */
-    private Map<Vertex<V, E>, Edge<V, E>> incoming;
+    private final Map<Vertex<V, E>, Edge<V, E>> incoming;
 
     /**
      * Constructs a new vertex holding {@code element}.
