@@ -37,12 +37,12 @@ public class GraphTest {
     public void setUp() {
         graph = new Graph<>(false);
         alice = graph.insertVertex("Alice");
-        bob   = graph.insertVertex("Bob");
+        bob = graph.insertVertex("Bob");
         carol = graph.insertVertex("Carol");
-        dan   = graph.insertVertex("Dan");
-        eve   = graph.insertVertex("Eve");
-        edgeAB = graph.insertEdge(alice, bob,   "AB");
-        edgeBC = graph.insertEdge(bob,   carol, "BC");
+        dan = graph.insertVertex("Dan");
+        eve = graph.insertVertex("Eve");
+        edgeAB = graph.insertEdge(alice, bob, "AB");
+        edgeBC = graph.insertEdge(bob, carol, "BC");
         graph.insertEdge(dan, eve, "DE");
     }
 
@@ -136,9 +136,9 @@ public class GraphTest {
     @DisplayName("insertEdge (undirected): edge reachable from both endpoints via outgoingEdges and incomingEdges")
     public void testInsertEdgeUndirectedSharedMap() {
         List<Edge<String, String>> outAlice = new ArrayList<>();
-        List<Edge<String, String>> inAlice  = new ArrayList<>();
-        List<Edge<String, String>> outBob   = new ArrayList<>();
-        List<Edge<String, String>> inBob    = new ArrayList<>();
+        List<Edge<String, String>> inAlice = new ArrayList<>();
+        List<Edge<String, String>> outBob = new ArrayList<>();
+        List<Edge<String, String>> inBob = new ArrayList<>();
         graph.outgoingEdges(alice).forEach(outAlice::add);
         graph.incomingEdges(alice).forEach(inAlice::add);
         graph.outgoingEdges(bob).forEach(outBob::add);
@@ -158,9 +158,9 @@ public class GraphTest {
         Edge<String, String> e = dg.insertEdge(u, v, "UV");
 
         List<Edge<String, String>> outU = new ArrayList<>();
-        List<Edge<String, String>> inU  = new ArrayList<>();
+        List<Edge<String, String>> inU = new ArrayList<>();
         List<Edge<String, String>> outV = new ArrayList<>();
-        List<Edge<String, String>> inV  = new ArrayList<>();
+        List<Edge<String, String>> inV = new ArrayList<>();
         dg.outgoingEdges(u).forEach(outU::add);
         dg.incomingEdges(u).forEach(inU::add);
         dg.outgoingEdges(v).forEach(outV::add);
@@ -215,7 +215,7 @@ public class GraphTest {
     public void testEndVerticesInsertionOrder() {
         Vertex<String, String>[] endpoints = graph.endVertices(edgeAB);
         assertSame(alice, endpoints[0]);
-        assertSame(bob,   endpoints[1]);
+        assertSame(bob, endpoints[1]);
     }
 
     // --- opposite ---
@@ -244,10 +244,10 @@ public class GraphTest {
     @DisplayName("outDegree / inDegree (undirected): outDegree == inDegree for every vertex")
     public void testDegreeUndirectedSymmetric() {
         assertEquals(graph.outDegree(alice), graph.inDegree(alice));
-        assertEquals(graph.outDegree(bob),   graph.inDegree(bob));
+        assertEquals(graph.outDegree(bob), graph.inDegree(bob));
         assertEquals(graph.outDegree(carol), graph.inDegree(carol));
-        assertEquals(graph.outDegree(dan),   graph.inDegree(dan));
-        assertEquals(graph.outDegree(eve),   graph.inDegree(eve));
+        assertEquals(graph.outDegree(dan), graph.inDegree(dan));
+        assertEquals(graph.outDegree(eve), graph.inDegree(eve));
     }
 
     @Test
@@ -291,9 +291,9 @@ public class GraphTest {
         Edge<String, String> e = dg.insertEdge(u, v, "UV");
 
         List<Edge<String, String>> outU = new ArrayList<>();
-        List<Edge<String, String>> inU  = new ArrayList<>();
+        List<Edge<String, String>> inU = new ArrayList<>();
         List<Edge<String, String>> outV = new ArrayList<>();
-        List<Edge<String, String>> inV  = new ArrayList<>();
+        List<Edge<String, String>> inV = new ArrayList<>();
         dg.outgoingEdges(u).forEach(outU::add);
         dg.incomingEdges(u).forEach(inU::add);
         dg.outgoingEdges(v).forEach(outV::add);
@@ -343,10 +343,10 @@ public class GraphTest {
     @DisplayName("removeEdge (undirected): both endpoints' degrees decrease by 1")
     public void testRemoveEdgeUndirectedDegreeDecreases() {
         int aliceBefore = graph.outDegree(alice);
-        int bobBefore   = graph.outDegree(bob);
+        int bobBefore = graph.outDegree(bob);
         graph.removeEdge(edgeAB);
         assertEquals(aliceBefore - 1, graph.outDegree(alice));
-        assertEquals(bobBefore   - 1, graph.outDegree(bob));
+        assertEquals(bobBefore - 1, graph.outDegree(bob));
     }
 
     @Test
