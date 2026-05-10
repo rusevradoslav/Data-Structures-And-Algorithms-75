@@ -1,6 +1,10 @@
 package org.example.j_graph;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Static utility class providing graph traversal algorithms.
