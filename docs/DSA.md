@@ -17,6 +17,13 @@
     - [Inorder Traversal](#inorder-traversal)
   - [Quick Reference](#quick-reference)
 - [Graphs](#graphs)
+  - [Fundamentals](#fundamentals-1)
+  - [Data Structures for Graphs](#data-structures-for-graphs)
+  - [Graph Traversals](#graph-traversals)
+    - [Depth-First Search (DFS)](#depth-first-search-dfs)
+    - [Breadth-First Search (BFS)](#breadth-first-search-bfs)
+    - [DFS vs BFS](#dfs-vs-bfs)
+    - [Path Reconstruction](#path-reconstruction)
 - [Heaps & Priority Queues](#heaps--priority-queues)
 - [Binary Search](#binary-search)
 - [Dynamic Programming](#dynamic-programming)
@@ -1077,7 +1084,475 @@ Inorder → `[1, 3, 6, 8, 9, 12, 15]`
 
 ## Graphs
 
-> Placeholder — to be added.
+### Fundamentals
+
+**Definition**
+
+A graph is a data structure that models things and the connections between them. Formally written as G = (V, E), where V is a set of vertices (the things) and E is a set of edges (the connections between them).
+
+If a problem can be phrased as "X is related to Y," it can almost always be modeled as a graph. Common applications: social networks, road maps, web links, dependency systems, network routing.
+
+**Terminology**
+
+| Term | Definition |
+|---|---|
+| Vertex (node) | An entity in the graph (person, city, page) |
+| Edge | A connection between two vertices |
+| Endpoints | The two vertices an edge connects |
+| Adjacent | Two vertices connected by an edge (neighbors) |
+| Incident | An edge "touches" a vertex when that vertex is its endpoint |
+| Degree | Number of edges incident to a vertex |
+| In-degree / Out-degree | For directed graphs: arrows in vs. arrows out |
+| Path | Sequence of vertices connected by edges |
+| Cycle | Path that starts and ends at the same vertex |
+| Connected | Every vertex is reachable from every other vertex |
+| Connected component | A maximal connected subgraph (an "island") |
+
+**Edge Types**
+
+| Type | Direction | Example |
+|---|---|---|
+| Undirected | Mutual / symmetric | Facebook friendship |
+| Directed | One-way (arrow) | Twitter follow |
+
+A graph is classified by its edges. All-directed graphs are also called digraphs. A "mutual" relationship in a directed graph is modeled as two separate edges (A→B and B→A), not one.
+
+*Undirected edge vs. two opposite directed edges*
+
+For reachability, both let you move A↔B. Structurally they differ:
+
+| Aspect | One undirected edge | Two directed edges |
+|---|---|---|
+| Edge count | 1 | 2 |
+| Data per direction | Shared | Independent |
+| Remove one direction | Not possible | Possible |
+| Algorithm semantics | Symmetric by default | Asymmetric (in-degree ≠ out-degree) |
+
+Use undirected when the relationship is inherently mutual (Alice - Bob friendship). Use directed when directions can carry different data or change independently (Alice → Bob follow on Twitter, where Bob may or may not follow back).
+
+**Simple Graph (default assumption)**
+
+A simple graph forbids two things:
+- Self-loops — an edge from a vertex to itself.
+- Parallel edges — multiple edges between the same pair in the same direction.
+
+Under these rules:
+
+| Graph type | Max edges between A and B |
+|---|---|
+| Simple undirected | 1 |
+| Simple directed | 2 (one each direction) |
+
+**Example**
+
+```
+Alice ────── Bob ────── Carol      Dan ────── Eve
+
+V = { Alice, Bob, Carol, Dan, Eve }
+E = { (Alice, Bob), (Bob, Carol), (Dan, Eve) }
+```
+
+| Query | Result |
+|---|---|
+| numVertices | 5 |
+| numEdges | 3 |
+| Bob's neighbors | Alice, Carol |
+| Bob's degree | 2 |
+| Alice's degree | 1 |
+| Dan's degree | 1 |
+| Path from Alice to Carol | Alice → Bob → Carol |
+| Alice and Carol adjacent? | No (connected through Bob) |
+| Path from Alice to Dan? | None — different components |
+| Connected? | No — graph splits into two islands |
+| Connected components | { Alice, Bob, Carol }, { Dan, Eve } |
+| Sum of degrees | 6 = 2 × \|E\| (each edge counted from both endpoints) |
+
+If we add the edge (Carol, Dan), both components merge into one connected graph with |E| = 4 and sum of degrees = 8.
+
+---
+
+### Data Structures for Graphs
+
+**Shared example**
+
+```
+    Alice ────── Bob ────── Carol
+                  │
+                  │
+                 Dan
+
+V = { Alice, Bob, Carol, Dan }, E = { (Alice, Bob), (Bob, Carol), (Bob, Dan) }
+Vertex indices for the matrix: Alice=0, Bob=1, Carol=2, Dan=3.
+```
+
+**Adjacency Matrix**
+
+A 2D array of size n × n, where cell [i][j] answers "is there an edge from vertex i to vertex j?"
+
+```
+        Alice  Bob  Carol  Dan
+Alice [   0     1     0     0  ]
+Bob   [   1     0     1     1  ]
+Carol [   0     1     0     0  ]
+Dan   [   0     1     0     0  ]
+```
+
+For undirected graphs the matrix is symmetric. Edge-existence check is O(1), but memory is always n² regardless of edge count, and "get neighbors of v" is O(n). Best fit: dense graphs.
+
+**Adjacency List**
+
+Each vertex holds its own list of neighbors.
+
+```
+Alice → [Bob]
+Bob   → [Alice, Carol, Dan]
+Carol → [Bob]
+Dan   → [Bob]
+```
+
+Memory is O(n + m). "Get neighbors of v" is O(deg(v)). Edge-existence check is O(deg(u)). Best fit: sparse graphs.
+
+**Adjacency Map**
+
+Same shape as adjacency list, but each vertex stores neighbors in a hash map keyed by the neighbor vertex; the value is the connecting edge.
+
+```
+Alice → { Bob → edge1 }
+Bob   → { Alice → edge1, Carol → edge2, Dan → edge3 }
+Carol → { Bob → edge2 }
+Dan   → { Bob → edge3 }
+```
+
+Memory is O(n + m). All operations — including edge existence, neighbor lookup, insert, remove — become O(1) average. Best fit: general-purpose default for sparse graphs.
+
+**Comparison**
+
+n = vertices, m = edges, deg(v) = degree of vertex v.
+
+| Operation | Matrix | List | Map |
+|---|---|---|---|
+| Space | O(n²) | O(n + m) | O(n + m) |
+| Get all edges | O(n²) | O(m) | O(m) |
+| Get neighbors of v | O(n) | O(deg(v)) | O(deg(v)) |
+| Is there edge (u, v)? | O(1) | O(deg(u)) | O(1) |
+| Insert vertex | O(n²) resize | O(1) | O(1) |
+| Insert edge | O(1) | O(1) | O(1) |
+| Remove edge | O(1) | O(deg(v)) | O(1) |
+
+**Why Adjacency Map**
+
+Matches or beats the alternatives on every operation while keeping memory at O(n + m). Matrix wastes memory on sparse graphs (n² regardless of edge count). List is slow on edge-existence and edge removal, both common inside graph algorithms. Map gives matrix-quality lookup speed at list-quality memory cost. Most real-world graphs are sparse, making this the right default.
+
+**Java Implementation**
+
+`Vertex.java`
+
+```java
+public class Vertex<V, E> {
+
+    private final V element;
+    private final Map<Vertex<V, E>, Edge<V, E>> outgoing;
+    private final Map<Vertex<V, E>, Edge<V, E>> incoming;
+
+    public Vertex(V element, boolean directed) {
+        this.element = element;
+        this.outgoing = new HashMap<>();
+        this.incoming = !directed ? this.outgoing : new HashMap<>();
+    }
+
+    public V getElement() { return element; }
+    public Map<Vertex<V, E>, Edge<V, E>> getOutgoing() { return outgoing; }
+    public Map<Vertex<V, E>, Edge<V, E>> getIncoming() { return incoming; }
+}
+```
+
+`Edge.java`
+
+```java
+public class Edge<V, E> {
+
+    private final E element;
+    private final Vertex<V, E>[] endpoints;
+
+    public Edge(Vertex<V, E> origin, Vertex<V, E> destination, E element) {
+        this.endpoints = new Vertex[]{origin, destination};
+        this.element = element;
+    }
+
+    public E getElement() { return element; }
+    public Vertex<V, E>[] getEndpoints() { return endpoints; }
+}
+```
+
+`Graph.java`
+
+```java
+public class Graph<V, E> {
+
+    private final boolean directed;
+    private final List<Vertex<V, E>> vertices = new ArrayList<>();
+    private final List<Edge<V, E>> edges = new ArrayList<>();
+
+    public Graph(boolean directed) { this.directed = directed; }
+
+    public boolean isDirected() { return directed; }
+    public int numVertices() { return vertices.size(); }
+    public int numEdges() { return edges.size(); }
+    public Iterable<Vertex<V, E>> vertices() { return vertices; }
+    public Iterable<Edge<V, E>> edges() { return edges; }
+
+    public Edge<V, E> getEdge(Vertex<V, E> u, Vertex<V, E> v) { ... }
+    public Vertex<V, E>[] endVertices(Edge<V, E> e) { ... }
+    public Vertex<V, E> opposite(Vertex<V, E> v, Edge<V, E> e) { ... }
+    public int outDegree(Vertex<V, E> v) { ... }
+    public int inDegree(Vertex<V, E> v) { ... }
+    public Iterable<Edge<V, E>> outgoingEdges(Vertex<V, E> v) { ... }
+    public Iterable<Edge<V, E>> incomingEdges(Vertex<V, E> v) { ... }
+    public Vertex<V, E> insertVertex(V element) { ... }
+    public Edge<V, E> insertEdge(Vertex<V, E> u, Vertex<V, E> v, E element) { ... }
+    public void removeVertex(Vertex<V, E> v) { ... }
+    public void removeEdge(Edge<V, E> e) { ... }
+}
+```
+
+**Graph methods**
+
+| Method | Description | Complexity |
+|---|---|---|
+| `numVertices()` | Number of vertices in the graph | O(1) |
+| `numEdges()` | Number of edges in the graph | O(1) |
+| `vertices()` | Iterable over all vertices | O(1) |
+| `edges()` | Iterable over all edges | O(1) |
+| `isDirected()` | Whether the graph is directed | O(1) |
+| `getEdge(u, v)` | Edge from u to v, or null | O(1) avg |
+| `endVertices(e)` | Two endpoints of e as [origin, destination] | O(1) |
+| `opposite(v, e)` | The endpoint of e that is not v | O(1) |
+| `outDegree(v)` | Number of outgoing edges from v | O(1) |
+| `inDegree(v)` | Number of incoming edges to v | O(1) |
+| `outgoingEdges(v)` | Iterable over v's outgoing edges | O(1) |
+| `incomingEdges(v)` | Iterable over v's incoming edges | O(1) |
+| `insertVertex(x)` | Add a new vertex with element x | O(1) avg |
+| `insertEdge(u, v, x)` | Add a new edge from u to v with element x | O(1) avg |
+| `removeVertex(v)` | Remove v and all incident edges | O(deg(v) · m) |
+| `removeEdge(e)` | Remove edge e | O(m) |
+
+---
+
+### Graph Traversals
+
+**Definition**
+
+A graph traversal systematically visits every vertex reachable from a starting vertex by following edges. The two canonical strategies are Depth-First Search (DFS) and Breadth-First Search (BFS), distinguished by the order in which they explore vertices.
+
+**Why a visited set is required**
+
+Unlike trees, graphs can contain cycles. Without tracking which vertices have been visited, traversal would loop forever. Every traversal maintains a `Set<Vertex>` to prevent revisiting.
+
+**Discovery forest**
+
+Both DFS and BFS return the same structure: a `Map<Vertex, Edge>` where each discovered vertex maps to the edge that first reached it. The start vertex is not included (it wasn't discovered through any edge). This map captures the parent-pointer representation of the traversal tree, allowing path reconstruction.
+
+| Term | Definition |
+|---|---|
+| Discovery edge | The edge through which a vertex was first reached |
+| Discovery forest | Map from each discovered vertex to its discovery edge |
+| Tree edge | Synonym for discovery edge |
+| Connected component | The set of vertices reachable from any vertex in it |
+
+---
+
+#### Depth-First Search (DFS)
+
+Strategy: Go as deep as possible along one path before backtracking. Recursive by nature.
+
+**Algorithm**
+
+```java
+public Map<Vertex<V, E>, Edge<V, E>> traverse(Graph<V, E> graph, Vertex<V, E> start) {
+    Map<Vertex<V, E>, Edge<V, E>> forest = new HashMap<>();
+    Set<Vertex<V, E>> visited = new HashSet<>();
+    dfs(graph, start, visited, forest);
+    return forest;
+}
+
+private void dfs(Graph<V, E> graph, Vertex<V, E> origin,
+                 Set<Vertex<V, E>> visited,
+                 Map<Vertex<V, E>, Edge<V, E>> forest) {
+    visited.add(origin);
+    for (Edge<V, E> edge : graph.outgoingEdges(origin)) {
+        Vertex<V, E> destination = graph.opposite(origin, edge);
+        if (visited.contains(destination)) {
+            continue;
+        }
+        forest.put(destination, edge);
+        dfs(graph, destination, visited, forest);
+    }
+}
+```
+
+**Walk-Through**
+
+Graph:
+
+```
+    Alice ────── Bob ────── Carol
+                  │
+                 Dan
+```
+
+Example walk from Alice:
+
+| Step | Current | Visited so far | Action |
+|---|---|---|---|
+| 1 | Alice | {Alice} | Visit Bob |
+| 2 | Bob | {Alice, Bob} | Visit Carol |
+| 3 | Carol | {Alice, Bob, Carol} | Dead end — backtrack |
+| 4 | Bob | (same) | Visit Dan |
+| 5 | Dan | {Alice, Bob, Carol, Dan} | Dead end — done |
+
+Visit order: Alice → Bob → Carol → Dan.
+
+**Properties**
+
+| Property | Value |
+|---|---|
+| Time complexity | O(n + m) |
+| Space complexity | O(n) — visited set + call stack |
+| Path reconstructed via `constructPath` | Some path (not necessarily shortest) |
+| Best for | Cycle detection, topological sort, connected components |
+
+---
+
+#### Breadth-First Search (BFS)
+
+Strategy: Explore all vertices at distance 1, then all at distance 2, and so on. Iterative with a queue.
+
+**Algorithm**
+
+```java
+public Map<Vertex<V, E>, Edge<V, E>> traverse(Graph<V, E> graph, Vertex<V, E> start) {
+    Map<Vertex<V, E>, Edge<V, E>> forest = new HashMap<>();
+    Set<Vertex<V, E>> visited = new HashSet<>();
+    ArrayDeque<Vertex<V, E>> queue = new ArrayDeque<>();
+
+    visited.add(start);
+    queue.offer(start);
+    while (!queue.isEmpty()) {
+        Vertex<V, E> vertex = queue.poll();
+        for (Edge<V, E> edge : graph.outgoingEdges(vertex)) {
+            Vertex<V, E> destination = graph.opposite(vertex, edge);
+            if (visited.contains(destination)) {
+                continue;
+            }
+            visited.add(destination);
+            forest.put(destination, edge);
+            queue.offer(destination);
+        }
+    }
+    return forest;
+}
+```
+
+> Vertices are marked visited at the moment they are enqueued, not when dequeued. This prevents the same vertex from being enqueued multiple times.
+
+**Walk-Through**
+
+Graph:
+
+```
+    Alice ────── Bob ────── Carol
+                  │
+                 Dan
+```
+
+Example walk from Alice:
+
+| Step | Queue | Dequeued | Action |
+|---|---|---|---|
+| Init | [Alice] | — | Mark Alice visited |
+| 1 | [Bob] | Alice | Enqueue Bob |
+| 2 | [Carol, Dan] | Bob | Enqueue Carol and Dan |
+| 3 | [Dan] | Carol | No new neighbors |
+| 4 | [] | Dan | No new neighbors — done |
+
+Visit order: Alice → Bob → Carol → Dan.
+
+**Properties**
+
+| Property | Value |
+|---|---|
+| Time complexity | O(n + m) |
+| Space complexity | O(n) — visited set + queue |
+| Path reconstructed via `constructPath` | Shortest path (fewest edges) |
+| Best for | Shortest paths in unweighted graphs, level-order processing |
+
+---
+
+#### DFS vs BFS
+
+| Aspect | DFS | BFS |
+|---|---|---|
+| Strategy | Deep then back | Layer by layer |
+| Data structure | Recursion / stack | Queue (FIFO) |
+| Memory | O(depth) | O(width) |
+| Finds shortest path? | No | Yes (unweighted) |
+| Natural for | Cycle detection, DAG ordering | Shortest paths, distance from source |
+
+For weighted graphs, BFS does not give shortest paths — use Dijkstra's algorithm.
+
+---
+
+#### Path Reconstruction
+
+Given a discovery forest, the path from start to end is reconstructed by walking backwards from end through discovery edges until start is reached.
+
+**Algorithm**
+
+```java
+public static <V, E> List<Edge<V, E>> constructPath(
+        Graph<V, E> graph,
+        Vertex<V, E> start,
+        Vertex<V, E> end,
+        Map<Vertex<V, E>, Edge<V, E>> forest) {
+
+    List<Edge<V, E>> path = new LinkedList<>();
+    if (start == end) return path;
+    if (!forest.containsKey(end)) return path;
+
+    Vertex<V, E> walk = end;
+    while (walk != start) {
+        Edge<V, E> edge = forest.get(walk);
+        path.addFirst(edge);
+        walk = graph.opposite(walk, edge);
+    }
+    return path;
+}
+```
+
+**Example**
+
+Forest from BFS starting at Alice:
+
+```
+forest = {
+    Bob   → edge(Alice, Bob),
+    Carol → edge(Bob, Carol)
+}
+```
+
+`constructPath(graph, alice, carol, forest)` walks: Carol → (via edge BC) → Bob → (via edge AB) → Alice. Result: `[edge(Alice, Bob), edge(Bob, Carol)]`.
+
+**Behavior**
+
+| Case | Result |
+|---|---|
+| `start == end` | Empty list |
+| `end` not in forest (unreachable) | Empty list |
+| Forest from BFS | Shortest path (fewest edges) |
+| Forest from DFS | Some valid path |
+| Path requested toward original traversal root | Empty list (root is not in forest) |
+
+**Complexity:** O(path length), at most O(n).
 
 ---
 
