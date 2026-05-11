@@ -52,7 +52,7 @@ public class BfsGraphTraversal<V, E> implements GraphTraversal<V, E> {
         queue.offer(start);
         while (!queue.isEmpty()) {
             Vertex<V, E> vertex = queue.poll();
-            for (Edge<V, E> edge : graph.outgoingEdges(vertex)) {
+            for (Edge<V, E> edge : graph.getOutgoingEdges(vertex)) {
                 Vertex<V, E> destination = graph.opposite(vertex, edge);
                 if (visited.contains(destination)) {
                     continue;

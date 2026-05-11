@@ -52,7 +52,7 @@ public class DfsGraphTraversal<V, E> implements GraphTraversal<V, E> {
     private void dfs(Graph<V, E> graph, Vertex<V, E> origin, Set<Vertex<V, E>> visited,
                      Map<Vertex<V, E>, Edge<V, E>> forest) {
         visited.add(origin);
-        for (Edge<V, E> edge : graph.outgoingEdges(origin)) {
+        for (Edge<V, E> edge : graph.getOutgoingEdges(origin)) {
             Vertex<V, E> destination = graph.opposite(origin, edge);
             if (visited.contains(destination)) {
                 continue;

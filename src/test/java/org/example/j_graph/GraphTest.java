@@ -50,41 +50,41 @@ public class GraphTest {
 
     @Test
     @DisplayName("Empty graph: numVertices returns 0")
-    public void testNumVerticesEmptyGraph() {
+    public void testNumGetVerticesEmptyGraph() {
         Graph<String, String> empty = new Graph<>(false);
         assertEquals(0, empty.numVertices());
     }
 
     @Test
     @DisplayName("Empty graph: numEdges returns 0")
-    public void testNumEdgesEmptyGraph() {
+    public void testNumGetEdgesEmptyGraph() {
         Graph<String, String> empty = new Graph<>(false);
         assertEquals(0, empty.numEdges());
     }
 
     @Test
     @DisplayName("Empty graph: vertices() iterable is empty")
-    public void testVerticesEmptyGraph() {
+    public void testGetVerticesEmptyGraph() {
         Graph<String, String> empty = new Graph<>(false);
-        assertFalse(empty.vertices().iterator().hasNext());
+        assertFalse(empty.getVertices().iterator().hasNext());
     }
 
     @Test
     @DisplayName("Empty graph: edges() iterable is empty")
-    public void testEdgesEmptyGraph() {
+    public void testGetEdgesEmptyGraph() {
         Graph<String, String> empty = new Graph<>(false);
-        assertFalse(empty.edges().iterator().hasNext());
+        assertFalse(empty.getEdges().iterator().hasNext());
     }
 
     @Test
     @DisplayName("Fixture graph: numVertices returns 5")
-    public void testNumVerticesFixtureGraph() {
+    public void testNumGetVerticesFixtureGraph() {
         assertEquals(5, graph.numVertices());
     }
 
     @Test
     @DisplayName("Fixture graph: numEdges returns 3")
-    public void testNumEdgesFixtureGraph() {
+    public void testNumGetEdgesFixtureGraph() {
         assertEquals(3, graph.numEdges());
     }
 
@@ -108,7 +108,7 @@ public class GraphTest {
     @DisplayName("insertVertex: multiple insertions all appear in vertices()")
     public void testInsertVertexMultipleInsertions() {
         List<Vertex<String, String>> found = new ArrayList<>();
-        graph.vertices().forEach(found::add);
+        graph.getVertices().forEach(found::add);
         assertTrue(found.contains(alice));
         assertTrue(found.contains(bob));
         assertTrue(found.contains(carol));
@@ -120,9 +120,9 @@ public class GraphTest {
 
     @Test
     @DisplayName("insertEdge: new edge appears in graph's edges() iterable")
-    public void testInsertEdgeAppearsInEdgesList() {
+    public void testInsertEdgeAppearsInGetEdgesList() {
         List<Edge<String, String>> found = new ArrayList<>();
-        graph.edges().forEach(found::add);
+        graph.getEdges().forEach(found::add);
         assertTrue(found.contains(edgeAB));
     }
 
@@ -139,10 +139,10 @@ public class GraphTest {
         List<Edge<String, String>> inAlice = new ArrayList<>();
         List<Edge<String, String>> outBob = new ArrayList<>();
         List<Edge<String, String>> inBob = new ArrayList<>();
-        graph.outgoingEdges(alice).forEach(outAlice::add);
-        graph.incomingEdges(alice).forEach(inAlice::add);
-        graph.outgoingEdges(bob).forEach(outBob::add);
-        graph.incomingEdges(bob).forEach(inBob::add);
+        graph.getOutgoingEdges(alice).forEach(outAlice::add);
+        graph.getIncomingEdges(alice).forEach(inAlice::add);
+        graph.getOutgoingEdges(bob).forEach(outBob::add);
+        graph.getIncomingEdges(bob).forEach(inBob::add);
         assertTrue(outAlice.contains(edgeAB));
         assertTrue(inAlice.contains(edgeAB));
         assertTrue(outBob.contains(edgeAB));
@@ -161,10 +161,10 @@ public class GraphTest {
         List<Edge<String, String>> inU = new ArrayList<>();
         List<Edge<String, String>> outV = new ArrayList<>();
         List<Edge<String, String>> inV = new ArrayList<>();
-        dg.outgoingEdges(u).forEach(outU::add);
-        dg.incomingEdges(u).forEach(inU::add);
-        dg.outgoingEdges(v).forEach(outV::add);
-        dg.incomingEdges(v).forEach(inV::add);
+        dg.getOutgoingEdges(u).forEach(outU::add);
+        dg.getIncomingEdges(u).forEach(inU::add);
+        dg.getOutgoingEdges(v).forEach(outV::add);
+        dg.getIncomingEdges(v).forEach(inV::add);
 
         assertTrue(outU.contains(e));
         assertTrue(inV.contains(e));
@@ -212,7 +212,7 @@ public class GraphTest {
 
     @Test
     @DisplayName("endVertices: returns array with both endpoints in insertion order")
-    public void testEndVerticesInsertionOrder() {
+    public void testEndGetVerticesInsertionOrder() {
         Vertex<String, String>[] endpoints = graph.endVertices(edgeAB);
         assertSame(alice, endpoints[0]);
         assertSame(bob, endpoints[1]);
@@ -275,16 +275,16 @@ public class GraphTest {
 
     @Test
     @DisplayName("outgoingEdges (undirected): vertex with multiple edges contains all of them")
-    public void testOutgoingEdgesMultipleEdges() {
+    public void testGetOutgoingEdgesMultipleGetEdges() {
         List<Edge<String, String>> out = new ArrayList<>();
-        graph.outgoingEdges(bob).forEach(out::add);
+        graph.getOutgoingEdges(bob).forEach(out::add);
         assertTrue(out.contains(edgeAB));
         assertTrue(out.contains(edgeBC));
     }
 
     @Test
     @DisplayName("outgoingEdges / incomingEdges (directed): differ correctly")
-    public void testEdgesDirectedSeparation() {
+    public void testGetEdgesDirectedSeparation() {
         Graph<String, String> dg = new Graph<>(true);
         Vertex<String, String> u = dg.insertVertex("U");
         Vertex<String, String> v = dg.insertVertex("V");
@@ -294,10 +294,10 @@ public class GraphTest {
         List<Edge<String, String>> inU = new ArrayList<>();
         List<Edge<String, String>> outV = new ArrayList<>();
         List<Edge<String, String>> inV = new ArrayList<>();
-        dg.outgoingEdges(u).forEach(outU::add);
-        dg.incomingEdges(u).forEach(inU::add);
-        dg.outgoingEdges(v).forEach(outV::add);
-        dg.incomingEdges(v).forEach(inV::add);
+        dg.getOutgoingEdges(u).forEach(outU::add);
+        dg.getIncomingEdges(u).forEach(inU::add);
+        dg.getOutgoingEdges(v).forEach(outV::add);
+        dg.getIncomingEdges(v).forEach(inV::add);
 
         assertTrue(outU.contains(e));
         assertFalse(inU.contains(e));
@@ -307,20 +307,20 @@ public class GraphTest {
 
     @Test
     @DisplayName("outgoingEdges / incomingEdges: isolated vertex returns empty iterables")
-    public void testEdgesIsolatedVertexEmpty() {
+    public void testGetEdgesIsolatedVertexEmpty() {
         Vertex<String, String> iso = graph.insertVertex("Isolated");
-        assertFalse(graph.outgoingEdges(iso).iterator().hasNext());
-        assertFalse(graph.incomingEdges(iso).iterator().hasNext());
+        assertFalse(graph.getOutgoingEdges(iso).iterator().hasNext());
+        assertFalse(graph.getIncomingEdges(iso).iterator().hasNext());
     }
 
     // --- removeEdge ---
 
     @Test
     @DisplayName("removeEdge: edge no longer present in graph's edges() iterable")
-    public void testRemoveEdgeRemovedFromEdgesList() {
+    public void testRemoveEdgeRemovedFromGetEdgesList() {
         graph.removeEdge(edgeAB);
         List<Edge<String, String>> remaining = new ArrayList<>();
-        graph.edges().forEach(remaining::add);
+        graph.getEdges().forEach(remaining::add);
         assertFalse(remaining.contains(edgeAB));
     }
 
@@ -363,7 +363,7 @@ public class GraphTest {
 
     @Test
     @DisplayName("removeEdge: other edges on the same vertices are unaffected")
-    public void testRemoveEdgeOtherEdgesUnaffected() {
+    public void testRemoveEdgeOtherGetEdgesUnaffected() {
         graph.removeEdge(edgeAB);
         assertSame(edgeBC, graph.getEdge(bob, carol));
         assertEquals(1, graph.outDegree(bob));
@@ -373,16 +373,16 @@ public class GraphTest {
 
     @Test
     @DisplayName("removeVertex: vertex no longer present in graph's vertices() iterable")
-    public void testRemoveVertexRemovedFromVerticesList() {
+    public void testRemoveVertexRemovedFromGetVerticesList() {
         graph.removeVertex(alice);
         List<Vertex<String, String>> remaining = new ArrayList<>();
-        graph.vertices().forEach(remaining::add);
+        graph.getVertices().forEach(remaining::add);
         assertFalse(remaining.contains(alice));
     }
 
     @Test
     @DisplayName("removeVertex: all incident edges removed from graph's edges() iterable (3+ edges)")
-    public void testRemoveVertexIncidentEdgesRemoved() {
+    public void testRemoveVertexIncidentGetEdgesRemoved() {
         Vertex<String, String> frank = graph.insertVertex("Frank");
         Vertex<String, String> grace = graph.insertVertex("Grace");
         Edge<String, String> bobFrank = graph.insertEdge(bob, frank, "BF");
@@ -391,7 +391,7 @@ public class GraphTest {
         graph.removeVertex(bob);
 
         List<Edge<String, String>> remaining = new ArrayList<>();
-        graph.edges().forEach(remaining::add);
+        graph.getEdges().forEach(remaining::add);
         assertFalse(remaining.contains(edgeAB));
         assertFalse(remaining.contains(edgeBC));
         assertFalse(remaining.contains(bobFrank));
@@ -407,7 +407,7 @@ public class GraphTest {
 
     @Test
     @DisplayName("removeVertex (directed): incoming edges are also removed")
-    public void testRemoveVertexDirectedIncomingEdgesRemoved() {
+    public void testRemoveVertexDirectedIncomingGetEdgesRemoved() {
         Graph<String, String> dg = new Graph<>(true);
         Vertex<String, String> u = dg.insertVertex("U");
         Vertex<String, String> v = dg.insertVertex("V");
@@ -488,14 +488,14 @@ public class GraphTest {
 
     @Test
     @DisplayName("outgoingEdges: null vertex throws IllegalArgumentException")
-    public void testOutgoingEdgesNullVertexThrows() {
-        assertThrows(IllegalArgumentException.class, () -> graph.outgoingEdges(null));
+    public void testOutgoingGetEdgesNullVertexThrows() {
+        assertThrows(IllegalArgumentException.class, () -> graph.getOutgoingEdges(null));
     }
 
     @Test
     @DisplayName("incomingEdges: null vertex throws IllegalArgumentException")
-    public void testIncomingEdgesNullVertexThrows() {
-        assertThrows(IllegalArgumentException.class, () -> graph.incomingEdges(null));
+    public void testIncomingGetEdgesNullVertexThrows() {
+        assertThrows(IllegalArgumentException.class, () -> graph.getIncomingEdges(null));
     }
 
 

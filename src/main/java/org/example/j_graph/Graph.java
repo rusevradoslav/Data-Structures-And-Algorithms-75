@@ -59,7 +59,7 @@ public class Graph<V, E> {
      *
      * @return all vertices
      */
-    public Iterable<Vertex<V, E>> vertices() {
+    public Iterable<Vertex<V, E>> getVertices() {
         return this.vertices;
     }
 
@@ -77,7 +77,7 @@ public class Graph<V, E> {
      *
      * @return all edges
      */
-    public Iterable<Edge<V, E>> edges() {
+    public Iterable<Edge<V, E>> getEdges() {
         return this.edges;
     }
 
@@ -179,7 +179,7 @@ public class Graph<V, E> {
      * @return outgoing edges of {@code v}
      * @throws IllegalArgumentException if {@code v} is {@code null}
      */
-    public Iterable<Edge<V, E>> outgoingEdges(Vertex<V, E> v) {
+    public Iterable<Edge<V, E>> getOutgoingEdges(Vertex<V, E> v) {
         if (Objects.isNull(v)) {
             throw new IllegalArgumentException("Vertex must not be null");
         }
@@ -193,7 +193,7 @@ public class Graph<V, E> {
      * @return incoming edges of {@code v}
      * @throws IllegalArgumentException if {@code v} is {@code null}
      */
-    public Iterable<Edge<V, E>> incomingEdges(Vertex<V, E> v) {
+    public Iterable<Edge<V, E>> getIncomingEdges(Vertex<V, E> v) {
         if (Objects.isNull(v)) {
             throw new IllegalArgumentException("Vertex must not be null");
         }
@@ -218,7 +218,7 @@ public class Graph<V, E> {
      * and adds it to the graph.
      *
      * <p>For undirected graphs the edge is reachable from both endpoints via
-     * {@link #outgoingEdges(Vertex)} and {@link #incomingEdges(Vertex)}.
+     * {@link #getOutgoingEdges(Vertex)} and {@link #getIncomingEdges(Vertex)}.
      *
      * @param u       the source vertex
      * @param v       the destination vertex
