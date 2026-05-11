@@ -24,6 +24,7 @@
     - [Breadth-First Search (BFS)](#breadth-first-search-bfs)
     - [DFS vs BFS](#dfs-vs-bfs)
     - [Path Reconstruction](#path-reconstruction)
+    - [Transitive Closure](#transitive-closure)
 - [Heaps & Priority Queues](#heaps--priority-queues)
 - [Binary Search](#binary-search)
 - [Dynamic Programming](#dynamic-programming)
@@ -1298,8 +1299,8 @@ public class Graph<V, E> {
     public boolean isDirected() { return directed; }
     public int numVertices() { return vertices.size(); }
     public int numEdges() { return edges.size(); }
-    public Iterable<Vertex<V, E>> vertices() { return vertices; }
-    public Iterable<Edge<V, E>> edges() { return edges; }
+    public Iterable<Vertex<V, E>> getVertices() { return vertices; }
+    public Iterable<Edge<V, E>> getEdges() { return edges; }
 
     public Edge<V, E> getEdge(Vertex<V, E> u, Vertex<V, E> v) { ... }
     public Vertex<V, E>[] endVertices(Edge<V, E> e) { ... }
@@ -1317,24 +1318,24 @@ public class Graph<V, E> {
 
 **Graph methods**
 
-| Method | Description | Complexity |
-|---|---|---|
-| `numVertices()` | Number of vertices in the graph | O(1) |
-| `numEdges()` | Number of edges in the graph | O(1) |
-| `vertices()` | Iterable over all vertices | O(1) |
-| `edges()` | Iterable over all edges | O(1) |
-| `isDirected()` | Whether the graph is directed | O(1) |
-| `getEdge(u, v)` | Edge from u to v, or null | O(1) avg |
-| `endVertices(e)` | Two endpoints of e as [origin, destination] | O(1) |
-| `opposite(v, e)` | The endpoint of e that is not v | O(1) |
-| `outDegree(v)` | Number of outgoing edges from v | O(1) |
-| `inDegree(v)` | Number of incoming edges to v | O(1) |
-| `outgoingEdges(v)` | Iterable over v's outgoing edges | O(1) |
-| `incomingEdges(v)` | Iterable over v's incoming edges | O(1) |
-| `insertVertex(x)` | Add a new vertex with element x | O(1) avg |
+| Method                | Description | Complexity |
+|-----------------------|---|---|
+| `numVertices()`       | Number of vertices in the graph | O(1) |
+| `numEdges()`          | Number of edges in the graph | O(1) |
+| `getVertices()`       | Iterable over all vertices | O(1) |
+| `getEdges()`          | Iterable over all edges | O(1) |
+| `isDirected()`        | Whether the graph is directed | O(1) |
+| `getEdge(u, v)`       | Edge from u to v, or null | O(1) avg |
+| `endVertices(e)`      | Two endpoints of e as [origin, destination] | O(1) |
+| `opposite(v, e)`      | The endpoint of e that is not v | O(1) |
+| `outDegree(v)`        | Number of outgoing edges from v | O(1) |
+| `inDegree(v)`         | Number of incoming edges to v | O(1) |
+| `outgoingEdges(v)`    | Iterable over v's outgoing edges | O(1) |
+| `incomingEdges(v)`    | Iterable over v's incoming edges | O(1) |
+| `insertVertex(x)`     | Add a new vertex with element x | O(1) avg |
 | `insertEdge(u, v, x)` | Add a new edge from u to v with element x | O(1) avg |
-| `removeVertex(v)` | Remove v and all incident edges | O(deg(v) · m) |
-| `removeEdge(e)` | Remove edge e | O(m) |
+| `removeVertex(v)`     | Remove v and all incident edges | O(deg(v) · m) |
+| `removeEdge(e)`       | Remove edge e | O(m) |
 
 ---
 
@@ -1553,6 +1554,131 @@ forest = {
 | Path requested toward original traversal root | Empty list (root is not in forest) |
 
 **Complexity:** O(path length), at most O(n).
+
+---
+
+### Transitive Closure
+
+**Definition**
+
+The transitive closure of a directed graph G is the answer to the question "for every pair of vertices (u, v), can u reach v through any sequence of edges?" The result is typically represented as a new graph (or matrix, or map) where there is a direct edge u → v whenever v is reachable from u in the original graph.
+
+**Use cases**
+
+- Dependency analysis (does module A transitively depend on module B?)
+- Permission inheritance (does role A eventually grant permission B?)
+- Network reachability (can a packet eventually travel from router A to router B?)
+- Query optimization (are tables A and B joinable through any chain of foreign keys?)
+
+The point is precomputing reachability once when it will be asked many times. A single reachability question is answered cheaply with one DFS or BFS — the closure is the precomputed answer for all pairs.
+
+**Complexity notation**
+
+Throughout this section, n is the number of vertices and m is the number of edges in the graph.
+
+**Example**
+
+Consider a graph with direct edges A→B, B→C, B→D.
+
+Reachability from each vertex:
+
+| From | Can reach |
+|---|---|
+| A | B, C, D |
+| B | C, D |
+| C | (nothing) |
+| D | (nothing) |
+
+The closure adds the implied edges A→C and A→D — vertices reachable through chains in the original.
+
+---
+
+#### DFS Approach
+
+For each vertex u, run a DFS. Every vertex discovered by that DFS is reachable from u.
+
+```java
+public Map<Vertex<V, E>, Set<Vertex<V, E>>> closureAsMap(Graph<V, E> graph) {
+    Map<Vertex<V, E>, Set<Vertex<V, E>>> result = new HashMap<>();
+    for (Vertex<V, E> vertex : graph.getVertices()) {
+        Map<Vertex<V, E>, Edge<V, E>> forest = dfs.traverse(graph, vertex);
+        result.put(vertex, new HashSet<>(forest.keySet()));
+    }
+    return result;
+}
+```
+
+Reuses the existing DfsGraphTraversal. Does not mutate the input.
+
+**Complexity:** O(n · (n + m))
+
+A single DFS visits every vertex once and every edge at most twice, costing O(n + m). We run DFS once per vertex, so the total is n × O(n + m) = O(n · (n + m)).
+
+---
+
+#### Floyd-Warshall Approach
+
+For every possible "middle" vertex k, check every (source, destination) pair: if source reaches k and k reaches destination, then source reaches destination — add that edge if missing.
+
+```java
+private void floydWarshall(Graph<V, E> g) {
+    for (Vertex<V, E> middle : g.getVertices()) {
+        for (Vertex<V, E> source : g.getVertices()) {
+
+            boolean sourceReachesMiddle = Objects.nonNull(g.getEdge(source, middle));
+            boolean sourceIsNotMiddle = source != middle;
+
+            if (sourceIsNotMiddle && sourceReachesMiddle) {
+                for (Vertex<V, E> destination : g.getVertices()) {
+
+                    boolean middleReachesDestination = Objects.nonNull(g.getEdge(middle, destination));
+                    boolean sourceAlreadyReachesDestination = Objects.nonNull(g.getEdge(source, destination));
+                    boolean destinationIsNotMiddle = destination != middle;
+                    boolean destinationIsNotSource = source != destination;
+
+                    if (destinationIsNotSource &&
+                            destinationIsNotMiddle &&
+                            middleReachesDestination &&
+                            !sourceAlreadyReachesDestination) {
+                        g.insertEdge(source, destination, null);
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+**Why middle is the outer loop:** each pass adds shortcuts that later passes can build on. After the k-th iteration, the graph contains every reachability path that uses any of the first k vertices as intermediates.
+
+**Trace on a chain A → B → C → D:**
+
+| Pass | Action |
+|---|---|
+| middle = A | Nothing reaches A. No work. |
+| middle = B | A reaches B, B reaches C → add A → C |
+| middle = C | A reaches C (just added), B reaches C, C reaches D → add A → D and B → D |
+| middle = D | D has no outgoing edges. No work. |
+
+The key moment: middle = C adds A → D, which depends on the A → C edge added during middle = B. Earlier passes enable later ones — the reason middle must be outer.
+
+This approach mutates the input graph — after the call, the input graph IS its closure.
+
+**Complexity:** O(n³)
+
+Three nested loops, each iterating over all n vertices. The body of the innermost loop is constant work (a few O(1) edge lookups and possibly one insertion). Total: n × n × n = O(n³). The complexity does not depend on edge count.
+
+---
+
+#### DFS vs Floyd-Warshall
+
+| Aspect | DFS-from-every-vertex | Floyd-Warshall |
+|---|---|---|
+| Time complexity | O(n · (n + m)) | O(n³) |
+| Mutates input | No | Yes |
+| Best for | Sparse graphs | Dense graphs |
+
+For most real-world (sparse) graphs the DFS approach is preferable. Floyd-Warshall earns its place because the relaxation pattern ("if going through k helps, update the answer") generalizes to other algorithms like all-pairs shortest paths.
 
 ---
 
