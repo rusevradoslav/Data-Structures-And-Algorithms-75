@@ -156,7 +156,7 @@ The ordering follows the LeetCode 75 study plan sequence visible in the README s
 
 ## Language, Stack, and Conventions
 
-**Language:** Java 21
+**Language:** Java 21 (Java 25 upgrade pending)
 
 **Build:** Maven (`pom.xml`). Run tests with `mvn test`. Coverage via JaCoCo; reported to Codecov on CI.
 
