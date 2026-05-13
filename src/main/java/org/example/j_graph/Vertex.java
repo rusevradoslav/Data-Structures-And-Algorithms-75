@@ -2,6 +2,7 @@ package org.example.j_graph;
 
 import java.util.HashMap;
 import java.util.Map;
+import lombok.Getter;
 
 /**
  * Represents a vertex in a {@link Graph}.
@@ -20,18 +21,21 @@ import java.util.Map;
  */
 public class Vertex<V, E> {
 
+    @Getter
     private final V element;
 
     /**
      * Maps each out-neighbour to the edge leading to it.
      * For undirected graphs this is the same object as {@code incoming}.
      */
+    @Getter
     private final Map<Vertex<V, E>, Edge<V, E>> outgoing;
 
     /**
      * Maps each in-neighbour to the edge coming from it.
      * For undirected graphs this is the same object as {@code outgoing}.
      */
+    @Getter
     private final Map<Vertex<V, E>, Edge<V, E>> incoming;
 
     /**
@@ -51,34 +55,4 @@ public class Vertex<V, E> {
         this.incoming = !directed ? this.outgoing : new HashMap<>();
     }
 
-    /**
-     * Returns the element stored at this vertex.
-     *
-     * @return the vertex element
-     */
-    public V getElement() {
-        return this.element;
-    }
-
-    /**
-     * Returns the outgoing-edge map for this vertex.
-     *
-     * <p>In an undirected graph this is the same map returned by {@link #getIncoming()}.
-     *
-     * @return a mutable map from neighbouring vertex to outgoing edge
-     */
-    public Map<Vertex<V, E>, Edge<V, E>> getOutgoing() {
-        return this.outgoing;
-    }
-
-    /**
-     * Returns the incoming-edge map for this vertex.
-     *
-     * <p>In an undirected graph this is the same map returned by {@link #getOutgoing()}.
-     *
-     * @return a mutable map from neighbouring vertex to incoming edge
-     */
-    public Map<Vertex<V, E>, Edge<V, E>> getIncoming() {
-        return this.incoming;
-    }
 }
