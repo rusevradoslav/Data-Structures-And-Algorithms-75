@@ -19,23 +19,21 @@ import lombok.Getter;
  * @param <V> the type of element stored in this vertex
  * @param <E> the type of element stored on edges incident to this vertex
  */
+@Getter
 public class Vertex<V, E> {
 
-    @Getter
     private final V element;
 
     /**
      * Maps each out-neighbour to the edge leading to it.
      * For undirected graphs this is the same object as {@code incoming}.
      */
-    @Getter
     private final Map<Vertex<V, E>, Edge<V, E>> outgoing;
 
     /**
      * Maps each in-neighbour to the edge coming from it.
      * For undirected graphs this is the same object as {@code outgoing}.
      */
-    @Getter
     private final Map<Vertex<V, E>, Edge<V, E>> incoming;
 
     /**
