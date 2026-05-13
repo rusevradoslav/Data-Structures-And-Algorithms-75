@@ -62,8 +62,8 @@ public class InorderBinaryTreeTraversalImpl<E> implements BinaryTreeTraversal<E>
             return Collections.emptyList();
         }
 
-        if (Objects.isNull(node.left) && Objects.isNull(node.right)) {
-            return Collections.singletonList(node.val);
+        if (Objects.isNull(node.getLeft()) && Objects.isNull(node.getRight())) {
+            return Collections.singletonList(node.getVal());
         }
 
         List<E> result = new ArrayList<>();
@@ -75,9 +75,9 @@ public class InorderBinaryTreeTraversalImpl<E> implements BinaryTreeTraversal<E>
         if (Objects.isNull(node)) {
             return;
         }
-        executeInorderDFS(result, node.left);
-        result.add(node.val);
-        executeInorderDFS(result, node.right);
+        executeInorderDFS(result, node.getLeft());
+        result.add(node.getVal());
+        executeInorderDFS(result, node.getRight());
     }
 
 
@@ -93,8 +93,8 @@ public class InorderBinaryTreeTraversalImpl<E> implements BinaryTreeTraversal<E>
             return Collections.emptyList();
         }
 
-        if (Objects.isNull(node.left) && Objects.isNull(node.right)) {
-            return Collections.singletonList(node.val);
+        if (Objects.isNull(node.getLeft()) && Objects.isNull(node.getRight())) {
+            return Collections.singletonList(node.getVal());
         }
 
         List<E> result = new ArrayList<>();
@@ -104,12 +104,12 @@ public class InorderBinaryTreeTraversalImpl<E> implements BinaryTreeTraversal<E>
         while (Objects.nonNull(currentNode) || !stack.isEmpty()) {
             while (Objects.nonNull(currentNode)) {
                 stack.offerLast(currentNode);
-                currentNode = currentNode.left;
+                currentNode = currentNode.getLeft();
             }
 
             BinaryTreeNode<E> lastNode = stack.removeLast();
-            result.add(lastNode.val);
-            currentNode = lastNode.right;
+            result.add(lastNode.getVal());
+            currentNode = lastNode.getRight();
         }
         return result;
     }

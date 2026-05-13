@@ -24,11 +24,11 @@ public class PreorderBinaryTreeTraversalTest {
     @BeforeEach
     public void setUp() {
         root = new BinaryTreeNode<>(10);
-        root.left = new BinaryTreeNode<>(5);
-        root.right = new BinaryTreeNode<>(15);
-        root.left.left = new BinaryTreeNode<>(3);
-        root.left.right = new BinaryTreeNode<>(7);
-        root.right.right = new BinaryTreeNode<>(20);
+        root.setLeft(new BinaryTreeNode<>(5));
+        root.setRight(new BinaryTreeNode<>(15));
+        root.getLeft().setLeft(new BinaryTreeNode<>(3));
+        root.getLeft().setRight(new BinaryTreeNode<>(7));
+        root.getRight().setRight(new BinaryTreeNode<>(20));
 
         preorder = new PreorderBinaryTreeTraversal<>();
     }
@@ -68,8 +68,8 @@ public class PreorderBinaryTreeTraversalTest {
     @DisplayName("Left-skewed tree: [10, 5, 3]")
     public void testLeftSkewedTree() {
         BinaryTreeNode<Integer> skewed = new BinaryTreeNode<>(10);
-        skewed.left = new BinaryTreeNode<>(5);
-        skewed.left.left = new BinaryTreeNode<>(3);
+        skewed.setLeft(new BinaryTreeNode<>(5));
+        skewed.getLeft().setLeft(new BinaryTreeNode<>(3));
         assertEquals(List.of(10, 5, 3), preorder.recursive(skewed));
         assertEquals(List.of(10, 5, 3), preorder.iterative(skewed));
     }
@@ -78,8 +78,8 @@ public class PreorderBinaryTreeTraversalTest {
     @DisplayName("Right-skewed tree: [10, 15, 20]")
     public void testRightSkewedTree() {
         BinaryTreeNode<Integer> skewed = new BinaryTreeNode<>(10);
-        skewed.right = new BinaryTreeNode<>(15);
-        skewed.right.right = new BinaryTreeNode<>(20);
+        skewed.setRight(new BinaryTreeNode<>(15));
+        skewed.getRight().setRight(new BinaryTreeNode<>(20));
         assertEquals(List.of(10, 15, 20), preorder.recursive(skewed));
         assertEquals(List.of(10, 15, 20), preorder.iterative(skewed));
     }

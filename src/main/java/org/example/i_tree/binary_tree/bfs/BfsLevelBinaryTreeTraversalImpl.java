@@ -65,12 +65,12 @@ public class BfsLevelBinaryTreeTraversalImpl<E> implements BfsBinaryTreeTraversa
             List<E> levelElements = new ArrayList<>();
             for (int i = 0; i < size; i++) {
                 BinaryTreeNode<E> next = queue.poll();
-                levelElements.add(next.val);
-                if (Objects.nonNull(next.left)) {
-                    queue.offer(next.left);
+                levelElements.add(next.getVal());
+                if (Objects.nonNull(next.getLeft())) {
+                    queue.offer(next.getLeft());
                 }
-                if (Objects.nonNull(next.right)) {
-                    queue.offer(next.right);
+                if (Objects.nonNull(next.getRight())) {
+                    queue.offer(next.getRight());
                 }
             }
             result.add(levelElements);

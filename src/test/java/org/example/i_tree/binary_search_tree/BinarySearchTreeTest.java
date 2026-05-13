@@ -27,12 +27,12 @@ public class BinarySearchTreeTest {
     @BeforeEach
     public void setUp() {
         root = new BinaryTreeNode<>(8);
-        root.left = new BinaryTreeNode<>(3);
-        root.right = new BinaryTreeNode<>(12);
-        root.left.left = new BinaryTreeNode<>(1);
-        root.left.right = new BinaryTreeNode<>(6);
-        root.right.left = new BinaryTreeNode<>(9);
-        root.right.right = new BinaryTreeNode<>(15);
+        root.setLeft(new BinaryTreeNode<>(3));
+        root.setRight(new BinaryTreeNode<>(12));
+        root.getLeft().setLeft(new BinaryTreeNode<>(1));
+        root.getLeft().setRight(new BinaryTreeNode<>(6));
+        root.getRight().setLeft(new BinaryTreeNode<>(9));
+        root.getRight().setRight(new BinaryTreeNode<>(15));
 
         bst = new BinarySearchTree<>();
     }
@@ -43,18 +43,18 @@ public class BinarySearchTreeTest {
     @DisplayName("Search for leaf 1: returns node with no children")
     public void testSearchLeaf() {
         BinaryTreeNode<Integer> result = bst.search(root, 1);
-        assertEquals(1, result.val);
-        assertNull(result.left);
-        assertNull(result.right);
+        assertEquals(1, result.getVal());
+        assertNull(result.getLeft());
+        assertNull(result.getRight());
     }
 
     @Test
     @DisplayName("Search for internal node 3: returns node with correct children 1 and 6")
     public void testSearchInternalNode() {
         BinaryTreeNode<Integer> result = bst.search(root, 3);
-        assertEquals(3, result.val);
-        assertEquals(1, result.left.val);
-        assertEquals(6, result.right.val);
+        assertEquals(3, result.getVal());
+        assertEquals(1, result.getLeft().getVal());
+        assertEquals(6, result.getRight().getVal());
     }
 
     @Test
@@ -75,36 +75,36 @@ public class BinarySearchTreeTest {
     @DisplayName("Insert 5: placed as left child of 6")
     public void testInsertBecomesLeftChild() {
         BinaryTreeNode<Integer> result = bst.insert(root, 5);
-        assertEquals(5, result.left.right.left.val);
-        assertNull(result.left.right.left.left);
-        assertNull(result.left.right.left.right);
+        assertEquals(5, result.getLeft().getRight().getLeft().getVal());
+        assertNull(result.getLeft().getRight().getLeft().getLeft());
+        assertNull(result.getLeft().getRight().getLeft().getRight());
     }
 
     @Test
     @DisplayName("Insert 20: placed as right child of 15")
     public void testInsertBecomesRightChild() {
         BinaryTreeNode<Integer> result = bst.insert(root, 20);
-        assertEquals(20, result.right.right.right.val);
-        assertNull(result.right.right.right.left);
-        assertNull(result.right.right.right.right);
+        assertEquals(20, result.getRight().getRight().getRight().getVal());
+        assertNull(result.getRight().getRight().getRight().getLeft());
+        assertNull(result.getRight().getRight().getRight().getRight());
     }
 
     @Test
     @DisplayName("Insert into null tree: returns single root node with no children")
     public void testInsertIntoEmptyTree() {
         BinaryTreeNode<Integer> result = bst.insert(null, 10);
-        assertEquals(10, result.val);
-        assertNull(result.left);
-        assertNull(result.right);
+        assertEquals(10, result.getVal());
+        assertNull(result.getLeft());
+        assertNull(result.getRight());
     }
 
     @Test
     @DisplayName("Insert duplicate 8: tree structure unchanged")
     public void testInsertDuplicate() {
         BinaryTreeNode<Integer> result = bst.insert(root, 8);
-        assertEquals(3, result.left.val);
-        assertEquals(12, result.right.val);
-        assertNull(result.left.left.left);
+        assertEquals(3, result.getLeft().getVal());
+        assertEquals(12, result.getRight().getVal());
+        assertNull(result.getLeft().getLeft().getLeft());
     }
 
     // --- delete ---
@@ -113,35 +113,35 @@ public class BinarySearchTreeTest {
     @DisplayName("Delete leaf 1 — case 1: parent's left pointer becomes null")
     public void testDeleteLeaf() {
         BinaryTreeNode<Integer> result = bst.delete(root, 1);
-        assertNull(result.left.left);
-        assertEquals(3, result.left.val);
-        assertEquals(6, result.left.right.val);
+        assertNull(result.getLeft().getLeft());
+        assertEquals(3, result.getLeft().getVal());
+        assertEquals(6, result.getLeft().getRight().getVal());
     }
 
     @Test
     @DisplayName("Delete node 12 with two children — case 3: replaced by inorder successor 15, which loses its left child")
     public void testDeleteNodeWithTwoChildren() {
         BinaryTreeNode<Integer> result = bst.delete(root, 12);
-        assertEquals(15, result.right.val);
-        assertEquals(9, result.right.left.val);
-        assertNull(result.right.right);
+        assertEquals(15, result.getRight().getVal());
+        assertEquals(9, result.getRight().getLeft().getVal());
+        assertNull(result.getRight().getRight());
     }
 
     @Test
     @DisplayName("Delete root 8 with two children — case 3: new root is inorder successor 9")
     public void testDeleteRoot() {
         BinaryTreeNode<Integer> result = bst.delete(root, 8);
-        assertEquals(9, result.val);
-        assertNull(result.right.left);
+        assertEquals(9, result.getVal());
+        assertNull(result.getRight().getLeft());
     }
 
     @Test
     @DisplayName("Delete non-existing value: tree structure unchanged")
     public void testDeleteNonExisting() {
         BinaryTreeNode<Integer> result = bst.delete(root, 99);
-        assertEquals(8, result.val);
-        assertEquals(3, result.left.val);
-        assertEquals(12, result.right.val);
+        assertEquals(8, result.getVal());
+        assertEquals(3, result.getLeft().getVal());
+        assertEquals(12, result.getRight().getVal());
     }
 
     // --- findMin ---
@@ -193,19 +193,19 @@ public class BinarySearchTreeTest {
     @Test
     @DisplayName("Inorder successor of 8 (root) is 9")
     public void testInorderSuccessorOfRoot() {
-        assertEquals(9, bst.findInorderSuccessor(root, 8).val);
+        assertEquals(9, bst.findInorderSuccessor(root, 8).getVal());
     }
 
     @Test
     @DisplayName("Inorder successor of 6 is 8 (ancestor)")
     public void testInorderSuccessorAncestor() {
-        assertEquals(8, bst.findInorderSuccessor(root, 6).val);
+        assertEquals(8, bst.findInorderSuccessor(root, 6).getVal());
     }
 
     @Test
     @DisplayName("Inorder successor of 1 is 3")
     public void testInorderSuccessorLeaf() {
-        assertEquals(3, bst.findInorderSuccessor(root, 1).val);
+        assertEquals(3, bst.findInorderSuccessor(root, 1).getVal());
     }
 
     @Test
@@ -219,19 +219,19 @@ public class BinarySearchTreeTest {
     @Test
     @DisplayName("Inorder predecessor of 9 is 8 (root)")
     public void testInorderPredecessorOfNine() {
-        assertEquals(8, bst.findInorderPredecessor(root, 9).val);
+        assertEquals(8, bst.findInorderPredecessor(root, 9).getVal());
     }
 
     @Test
     @DisplayName("Inorder predecessor of 8 (root) is 6")
     public void testInorderPredecessorOfRoot() {
-        assertEquals(6, bst.findInorderPredecessor(root, 8).val);
+        assertEquals(6, bst.findInorderPredecessor(root, 8).getVal());
     }
 
     @Test
     @DisplayName("Inorder predecessor of 15 is 12")
     public void testInorderPredecessorLeaf() {
-        assertEquals(12, bst.findInorderPredecessor(root, 15).val);
+        assertEquals(12, bst.findInorderPredecessor(root, 15).getVal());
     }
 
     @Test
@@ -245,13 +245,13 @@ public class BinarySearchTreeTest {
     @Test
     @DisplayName("Floor of 7 (between 6 and 8) is 6")
     public void testFloorBetweenValues() {
-        assertEquals(6, bst.floor(root, 7).val);
+        assertEquals(6, bst.floor(root, 7).getVal());
     }
 
     @Test
     @DisplayName("Floor of exact match 9 is 9")
     public void testFloorExactMatch() {
-        assertEquals(9, bst.floor(root, 9).val);
+        assertEquals(9, bst.floor(root, 9).getVal());
     }
 
     @Test
@@ -265,13 +265,13 @@ public class BinarySearchTreeTest {
     @Test
     @DisplayName("Ceiling of 7 (between 6 and 8) is 8")
     public void testCeilingBetweenValues() {
-        assertEquals(8, bst.ceiling(root, 7).val);
+        assertEquals(8, bst.ceiling(root, 7).getVal());
     }
 
     @Test
     @DisplayName("Ceiling of exact match 9 is 9")
     public void testCeilingExactMatch() {
-        assertEquals(9, bst.ceiling(root, 9).val);
+        assertEquals(9, bst.ceiling(root, 9).getVal());
     }
 
     @Test
@@ -292,9 +292,9 @@ public class BinarySearchTreeTest {
     @DisplayName("Right child smaller than root: invalid BST returns false")
     public void testRightChildViolatesRoot() {
         BinaryTreeNode<Integer> invalid = new BinaryTreeNode<>(8);
-        invalid.left = new BinaryTreeNode<>(3);
-        invalid.right = new BinaryTreeNode<>(12);
-        invalid.right.left = new BinaryTreeNode<>(7);
+        invalid.setLeft(new BinaryTreeNode<>(3));
+        invalid.setRight(new BinaryTreeNode<>(12));
+        invalid.getRight().setLeft(new BinaryTreeNode<>(7));
         assertFalse(bst.isValidBST(invalid));
     }
 
@@ -302,8 +302,8 @@ public class BinarySearchTreeTest {
     @DisplayName("Locally valid but globally invalid BST returns false")
     public void testLocallyValidGloballyInvalid() {
         BinaryTreeNode<Integer> invalid = new BinaryTreeNode<>(5);
-        invalid.left = new BinaryTreeNode<>(3);
-        invalid.right = new BinaryTreeNode<>(4);
+        invalid.setLeft(new BinaryTreeNode<>(3));
+        invalid.setRight(new BinaryTreeNode<>(4));
         assertFalse(bst.isValidBST(invalid));
     }
 
@@ -357,8 +357,8 @@ public class BinarySearchTreeTest {
     @DisplayName("Inorder iteratively on left-skewed tree returns [1, 3, 8]")
     public void testInorderIterativelyLeftSkewed() {
         BinaryTreeNode<Integer> skewed = new BinaryTreeNode<>(8);
-        skewed.left = new BinaryTreeNode<>(3);
-        skewed.left.left = new BinaryTreeNode<>(1);
+        skewed.setLeft(new BinaryTreeNode<>(3));
+        skewed.getLeft().setLeft(new BinaryTreeNode<>(1));
         assertEquals(List.of(1, 3, 8), bst.inorderIteratively(skewed));
     }
 
@@ -366,8 +366,8 @@ public class BinarySearchTreeTest {
     @DisplayName("Inorder iteratively on right-skewed tree returns [8, 12, 15]")
     public void testInorderIterativelyRightSkewed() {
         BinaryTreeNode<Integer> skewed = new BinaryTreeNode<>(8);
-        skewed.right = new BinaryTreeNode<>(12);
-        skewed.right.right = new BinaryTreeNode<>(15);
+        skewed.setRight(new BinaryTreeNode<>(12));
+        skewed.getRight().setRight(new BinaryTreeNode<>(15));
         assertEquals(List.of(8, 12, 15), bst.inorderIteratively(skewed));
     }
 

@@ -58,8 +58,8 @@ public class PostorderBinaryTreeTraversalImpl<E> implements BinaryTreeTraversal<
             return Collections.emptyList();
         }
 
-        if (Objects.isNull(node.left) && Objects.isNull(node.right)) {
-            return Collections.singletonList(node.val);
+        if (Objects.isNull(node.getLeft()) && Objects.isNull(node.getRight())) {
+            return Collections.singletonList(node.getVal());
         }
 
         List<E> result = new ArrayList<>();
@@ -73,9 +73,9 @@ public class PostorderBinaryTreeTraversalImpl<E> implements BinaryTreeTraversal<
         if (Objects.isNull(node)) {
             return;
         }
-        executePostorderDFS(result, node.left);
-        executePostorderDFS(result, node.right);
-        result.add(node.val);
+        executePostorderDFS(result, node.getLeft());
+        executePostorderDFS(result, node.getRight());
+        result.add(node.getVal());
     }
 
     /**
@@ -91,21 +91,21 @@ public class PostorderBinaryTreeTraversalImpl<E> implements BinaryTreeTraversal<
             return Collections.emptyList();
         }
 
-        if (Objects.isNull(node.left) && Objects.isNull(node.right)) {
-            return Collections.singletonList(node.val);
+        if (Objects.isNull(node.getLeft()) && Objects.isNull(node.getRight())) {
+            return Collections.singletonList(node.getVal());
         }
         List<E> result = new LinkedList<>();
         Deque<BinaryTreeNode<E>> stack = new ArrayDeque<>();
         stack.offerLast(node);
         while (!stack.isEmpty()) {
             BinaryTreeNode<E> currentNode = stack.pollLast();
-            if (Objects.nonNull(currentNode.left)) {
-                stack.offerLast(currentNode.left);
+            if (Objects.nonNull(currentNode.getLeft())) {
+                stack.offerLast(currentNode.getLeft());
             }
-            if (Objects.nonNull(currentNode.right)) {
-                stack.offerLast(currentNode.right);
+            if (Objects.nonNull(currentNode.getRight())) {
+                stack.offerLast(currentNode.getRight());
             }
-            result.addFirst(currentNode.val);
+            result.addFirst(currentNode.getVal());
         }
 
         return result;

@@ -24,11 +24,11 @@ public class BinarySearchTree<E extends Comparable<E>> {
      */
     public BinaryTreeNode<E> search(BinaryTreeNode<E> node, E value) {
         while (Objects.nonNull(node)) {
-            int comparingResult = value.compareTo(node.val);
+            int comparingResult = value.compareTo(node.getVal());
             if (comparingResult < 0) {
-                node = node.left;
+                node = node.getLeft();
             } else if (comparingResult > 0) {
-                node = node.right;
+                node = node.getRight();
             } else {
                 return node;
             }
@@ -52,12 +52,12 @@ public class BinarySearchTree<E extends Comparable<E>> {
             return new BinaryTreeNode<>(value);
         }
 
-        int comparingResult = value.compareTo(node.val);
+        int comparingResult = value.compareTo(node.getVal());
 
         if (comparingResult < 0) {
-            node.left = insert(node.left, value);
+            node.setLeft(insert(node.getLeft(), value));
         } else if (comparingResult > 0) {
-            node.right = insert(node.right, value);
+            node.setRight(insert(node.getRight(), value));
         }
 
         return node;
@@ -84,23 +84,23 @@ public class BinarySearchTree<E extends Comparable<E>> {
             return null;
         }
 
-        int comparingResult = value.compareTo(node.val);
+        int comparingResult = value.compareTo(node.getVal());
         if (comparingResult < 0) {
-            node.left = delete(node.left, value);
+            node.setLeft(delete(node.getLeft(), value));
         } else if (comparingResult > 0) {
-            node.right = delete(node.right, value);
+            node.setRight(delete(node.getRight(), value));
         } else {
 
-            if (Objects.isNull(node.left)) {
-                return node.right;
+            if (Objects.isNull(node.getLeft())) {
+                return node.getRight();
             }
-            if (Objects.isNull(node.right)) {
-                return node.left;
+            if (Objects.isNull(node.getRight())) {
+                return node.getLeft();
             }
 
-            E minValue = findMin(node.right);
-            node.val = minValue;
-            node.right = delete(node.right, minValue);
+            E minValue = findMin(node.getRight());
+            node.setVal(minValue);
+            node.setRight(delete(node.getRight(), minValue));
         }
 
         return node;
@@ -119,12 +119,12 @@ public class BinarySearchTree<E extends Comparable<E>> {
     public BinaryTreeNode<E> findInorderSuccessor(BinaryTreeNode<E> root, E value) {
         BinaryTreeNode<E> successor = null;
         while (Objects.nonNull(root)) {
-            int comparingResult = value.compareTo(root.val);
+            int comparingResult = value.compareTo(root.getVal());
             if (comparingResult < 0) {
                 successor = root;
-                root = root.left;
+                root = root.getLeft();
             } else {
-                root = root.right;
+                root = root.getRight();
             }
         }
         return successor;
@@ -143,12 +143,12 @@ public class BinarySearchTree<E extends Comparable<E>> {
     public BinaryTreeNode<E> findInorderPredecessor(BinaryTreeNode<E> root, E value) {
         BinaryTreeNode<E> predecessor = null;
         while (Objects.nonNull(root)) {
-            int comparingResult = value.compareTo(root.val);
+            int comparingResult = value.compareTo(root.getVal());
             if (comparingResult > 0) {
                 predecessor = root;
-                root = root.right;
+                root = root.getRight();
             } else {
-                root = root.left;
+                root = root.getLeft();
             }
         }
         return predecessor;
@@ -164,10 +164,10 @@ public class BinarySearchTree<E extends Comparable<E>> {
         if (Objects.isNull(node)) {
             return null;
         }
-        while (Objects.nonNull(node.left)) {
-            node = node.left;
+        while (Objects.nonNull(node.getLeft())) {
+            node = node.getLeft();
         }
-        return node.val;
+        return node.getVal();
     }
 
     /**
@@ -180,10 +180,10 @@ public class BinarySearchTree<E extends Comparable<E>> {
         if (Objects.isNull(node)) {
             return null;
         }
-        while (Objects.nonNull(node.right)) {
-            node = node.right;
+        while (Objects.nonNull(node.getRight())) {
+            node = node.getRight();
         }
-        return node.val;
+        return node.getVal();
     }
 
     /**
@@ -197,16 +197,16 @@ public class BinarySearchTree<E extends Comparable<E>> {
     public BinaryTreeNode<E> floor(BinaryTreeNode<E> node, E value) {
         BinaryTreeNode<E> floorNode = null;
         while (Objects.nonNull(node)) {
-            int comparingResult = value.compareTo(node.val);
+            int comparingResult = value.compareTo(node.getVal());
             if (comparingResult == 0) {
                 floorNode = node;
                 break;
             }
             if (comparingResult < 0) {
-                node = node.left;
+                node = node.getLeft();
             } else {
                 floorNode = node;
-                node = node.right;
+                node = node.getRight();
             }
         }
         return floorNode;
@@ -223,7 +223,7 @@ public class BinarySearchTree<E extends Comparable<E>> {
     public BinaryTreeNode<E> ceiling(BinaryTreeNode<E> node, E value) {
         BinaryTreeNode<E> ceilingNode = null;
         while (Objects.nonNull(node)) {
-            int comparingResult = value.compareTo(node.val);
+            int comparingResult = value.compareTo(node.getVal());
             if (comparingResult == 0) {
                 ceilingNode = node;
                 break;
@@ -231,9 +231,9 @@ public class BinarySearchTree<E extends Comparable<E>> {
 
             if (comparingResult < 0) {
                 ceilingNode = node;
-                node = node.left;
+                node = node.getLeft();
             } else {
-                node = node.right;
+                node = node.getRight();
             }
         }
         return ceilingNode;
@@ -256,15 +256,15 @@ public class BinarySearchTree<E extends Comparable<E>> {
         if (Objects.isNull(node)) {
             return true;
         }
-        if (Objects.nonNull(min) && node.val.compareTo(min) <= 0) {
+        if (Objects.nonNull(min) && node.getVal().compareTo(min) <= 0) {
             return false;
         }
-        if (Objects.nonNull(max) && node.val.compareTo(max) >= 0) {
+        if (Objects.nonNull(max) && node.getVal().compareTo(max) >= 0) {
             return false;
         }
 
-        return isValid(node.left, min, node.val) &&
-                isValid(node.right, node.val, max);
+        return isValid(node.getLeft(), min, node.getVal()) &&
+                isValid(node.getRight(), node.getVal(), max);
     }
 
     /**
@@ -288,9 +288,9 @@ public class BinarySearchTree<E extends Comparable<E>> {
         if (Objects.isNull(node)) {
             return;
         }
-        collectElementsRecursively(elements, node.left);
-        elements.add(node.val);
-        collectElementsRecursively(elements, node.right);
+        collectElementsRecursively(elements, node.getLeft());
+        elements.add(node.getVal());
+        collectElementsRecursively(elements, node.getRight());
     }
 
     /**
@@ -312,11 +312,11 @@ public class BinarySearchTree<E extends Comparable<E>> {
         while (Objects.nonNull(current) || !stack.isEmpty()) {
             while (Objects.nonNull(current)) {
                 stack.push(current);
-                current = current.left;
+                current = current.getLeft();
             }
             BinaryTreeNode<E> lastNode = stack.pop();
-            elements.add(lastNode.val);
-            current = lastNode.right;
+            elements.add(lastNode.getVal());
+            current = lastNode.getRight();
         }
 
         return elements;

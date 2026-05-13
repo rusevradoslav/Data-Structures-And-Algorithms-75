@@ -57,12 +57,12 @@ public class BfsFlatBinaryTreeTraversalImpl<E> implements BfsBinaryTreeTraversal
 
         while (!queue.isEmpty()) {
             BinaryTreeNode<E> element = queue.poll();
-            result.add(element.val);
-            if (Objects.nonNull(element.left)) {
-                queue.offer(element.left);
+            result.add(element.getVal());
+            if (Objects.nonNull(element.getLeft())) {
+                queue.offer(element.getLeft());
             }
-            if (Objects.nonNull(element.right)) {
-                queue.offer(element.right);
+            if (Objects.nonNull(element.getRight())) {
+                queue.offer(element.getRight());
             }
         }
 

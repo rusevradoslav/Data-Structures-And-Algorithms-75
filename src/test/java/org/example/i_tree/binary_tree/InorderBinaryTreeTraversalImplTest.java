@@ -24,11 +24,11 @@ public class InorderBinaryTreeTraversalImplTest {
     @BeforeEach
     public void setUp() {
         root = new BinaryTreeNode<>(10);
-        root.left = new BinaryTreeNode<>(5);
-        root.right = new BinaryTreeNode<>(15);
-        root.left.left = new BinaryTreeNode<>(3);
-        root.left.right = new BinaryTreeNode<>(7);
-        root.right.right = new BinaryTreeNode<>(20);
+        root.setLeft(new BinaryTreeNode<>(5));
+        root.setRight(new BinaryTreeNode<>(15));
+        root.getLeft().setLeft(new BinaryTreeNode<>(3));
+        root.getLeft().setRight(new BinaryTreeNode<>(7));
+        root.getRight().setRight(new BinaryTreeNode<>(20));
 
         inorder = new InorderBinaryTreeTraversalImpl<>();
     }
@@ -68,8 +68,8 @@ public class InorderBinaryTreeTraversalImplTest {
     @DisplayName("Left-skewed tree: [3, 5, 10]")
     public void testLeftSkewedTree() {
         BinaryTreeNode<Integer> skewed = new BinaryTreeNode<>(10);
-        skewed.left = new BinaryTreeNode<>(5);
-        skewed.left.left = new BinaryTreeNode<>(3);
+        skewed.setLeft(new BinaryTreeNode<>(5));
+        skewed.getLeft().setLeft(new BinaryTreeNode<>(3));
         assertEquals(List.of(3, 5, 10), inorder.recursive(skewed));
         assertEquals(List.of(3, 5, 10), inorder.iterative(skewed));
     }
@@ -78,8 +78,8 @@ public class InorderBinaryTreeTraversalImplTest {
     @DisplayName("Right-skewed tree: [10, 15, 20]")
     public void testRightSkewedTree() {
         BinaryTreeNode<Integer> skewed = new BinaryTreeNode<>(10);
-        skewed.right = new BinaryTreeNode<>(15);
-        skewed.right.right = new BinaryTreeNode<>(20);
+        skewed.setRight(new BinaryTreeNode<>(15));
+        skewed.getRight().setRight(new BinaryTreeNode<>(20));
         assertEquals(List.of(10, 15, 20), inorder.recursive(skewed));
         assertEquals(List.of(10, 15, 20), inorder.iterative(skewed));
     }
@@ -88,10 +88,10 @@ public class InorderBinaryTreeTraversalImplTest {
     @DisplayName("Tree with right subtree having left child: [1, 3, 5, 6, 8]")
     public void testRightSubtreeWithLeftChild() {
         BinaryTreeNode<Integer> node = new BinaryTreeNode<>(5);
-        node.left = new BinaryTreeNode<>(3);
-        node.right = new BinaryTreeNode<>(8);
-        node.left.left = new BinaryTreeNode<>(1);
-        node.right.left = new BinaryTreeNode<>(6);
+        node.setLeft(new BinaryTreeNode<>(3));
+        node.setRight(new BinaryTreeNode<>(8));
+        node.getLeft().setLeft(new BinaryTreeNode<>(1));
+        node.getRight().setLeft(new BinaryTreeNode<>(6));
 
         assertEquals(List.of(1, 3, 5, 6, 8), inorder.recursive(node));
         assertEquals(List.of(1, 3, 5, 6, 8), inorder.iterative(node));

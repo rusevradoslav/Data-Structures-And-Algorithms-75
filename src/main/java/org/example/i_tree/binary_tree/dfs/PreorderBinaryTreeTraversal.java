@@ -60,8 +60,8 @@ public class PreorderBinaryTreeTraversal<E> implements BinaryTreeTraversal<E> {
             return Collections.emptyList();
         }
 
-        if (Objects.isNull(node.left) && Objects.isNull(node.right)) {
-            return Collections.singletonList(node.val);
+        if (Objects.isNull(node.getLeft()) && Objects.isNull(node.getRight())) {
+            return Collections.singletonList(node.getVal());
         }
 
         List<E> result = new ArrayList<>();
@@ -73,9 +73,9 @@ public class PreorderBinaryTreeTraversal<E> implements BinaryTreeTraversal<E> {
         if (Objects.isNull(node)) {
             return;
         }
-        res.add(node.val);
-        executePreorderDFS(res, node.left);
-        executePreorderDFS(res, node.right);
+        res.add(node.getVal());
+        executePreorderDFS(res, node.getLeft());
+        executePreorderDFS(res, node.getRight());
     }
 
     /**
@@ -90,8 +90,8 @@ public class PreorderBinaryTreeTraversal<E> implements BinaryTreeTraversal<E> {
             return Collections.emptyList();
         }
 
-        if (Objects.isNull(node.left) && Objects.isNull(node.right)) {
-            return Collections.singletonList(node.val);
+        if (Objects.isNull(node.getLeft()) && Objects.isNull(node.getRight())) {
+            return Collections.singletonList(node.getVal());
         }
 
         List<E> result = new ArrayList<>();
@@ -100,13 +100,13 @@ public class PreorderBinaryTreeTraversal<E> implements BinaryTreeTraversal<E> {
 
         while (!stack.isEmpty()) {
             BinaryTreeNode<E> topNode = stack.pollLast();
-            result.add(topNode.val);
+            result.add(topNode.getVal());
 
-            if (Objects.nonNull(topNode.right)){
-                stack.offerLast(topNode.right);
+            if (Objects.nonNull(topNode.getRight())){
+                stack.offerLast(topNode.getRight());
             }
-            if (Objects.nonNull(topNode.left)){
-                stack.offerLast(topNode.left);
+            if (Objects.nonNull(topNode.getLeft())){
+                stack.offerLast(topNode.getLeft());
             }
         }
         return result;

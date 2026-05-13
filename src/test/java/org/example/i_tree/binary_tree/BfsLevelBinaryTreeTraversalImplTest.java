@@ -24,11 +24,11 @@ public class BfsLevelBinaryTreeTraversalImplTest {
     @BeforeEach
     public void setUp() {
         root = new BinaryTreeNode<>(10);
-        root.left = new BinaryTreeNode<>(5);
-        root.right = new BinaryTreeNode<>(15);
-        root.left.left = new BinaryTreeNode<>(3);
-        root.left.right = new BinaryTreeNode<>(7);
-        root.right.right = new BinaryTreeNode<>(20);
+        root.setLeft(new BinaryTreeNode<>(5));
+        root.setRight(new BinaryTreeNode<>(15));
+        root.getLeft().setLeft(new BinaryTreeNode<>(3));
+        root.getLeft().setRight(new BinaryTreeNode<>(7));
+        root.getRight().setRight(new BinaryTreeNode<>(20));
 
         bfs = new BfsLevelBinaryTreeTraversalImpl<>();
     }
@@ -59,8 +59,8 @@ public class BfsLevelBinaryTreeTraversalImplTest {
     @DisplayName("Left-skewed tree: [[10], [5], [3]]")
     public void testLeftSkewedTree() {
         BinaryTreeNode<Integer> skewed = new BinaryTreeNode<>(10);
-        skewed.left = new BinaryTreeNode<>(5);
-        skewed.left.left = new BinaryTreeNode<>(3);
+        skewed.setLeft(new BinaryTreeNode<>(5));
+        skewed.getLeft().setLeft(new BinaryTreeNode<>(3));
         assertEquals(List.of(List.of(10), List.of(5), List.of(3)), bfs.traverse(skewed));
     }
 
@@ -68,8 +68,8 @@ public class BfsLevelBinaryTreeTraversalImplTest {
     @DisplayName("Right-skewed tree: [[10], [15], [20]]")
     public void testRightSkewedTree() {
         BinaryTreeNode<Integer> skewed = new BinaryTreeNode<>(10);
-        skewed.right = new BinaryTreeNode<>(15);
-        skewed.right.right = new BinaryTreeNode<>(20);
+        skewed.setRight(new BinaryTreeNode<>(15));
+        skewed.getRight().setRight(new BinaryTreeNode<>(20));
         assertEquals(List.of(List.of(10), List.of(15), List.of(20)), bfs.traverse(skewed));
     }
 
@@ -77,12 +77,12 @@ public class BfsLevelBinaryTreeTraversalImplTest {
     @DisplayName("Complete binary tree: [[1], [2, 3], [4, 5, 6, 7]]")
     public void testCompleteBinaryTree() {
         BinaryTreeNode<Integer> node = new BinaryTreeNode<>(1);
-        node.left = new BinaryTreeNode<>(2);
-        node.right = new BinaryTreeNode<>(3);
-        node.left.left = new BinaryTreeNode<>(4);
-        node.left.right = new BinaryTreeNode<>(5);
-        node.right.left = new BinaryTreeNode<>(6);
-        node.right.right = new BinaryTreeNode<>(7);
+        node.setLeft(new BinaryTreeNode<>(2));
+        node.setRight(new BinaryTreeNode<>(3));
+        node.getLeft().setLeft(new BinaryTreeNode<>(4));
+        node.getLeft().setRight(new BinaryTreeNode<>(5));
+        node.getRight().setLeft(new BinaryTreeNode<>(6));
+        node.getRight().setRight(new BinaryTreeNode<>(7));
         assertEquals(List.of(List.of(1), List.of(2, 3), List.of(4, 5, 6, 7)), bfs.traverse(node));
     }
 }
