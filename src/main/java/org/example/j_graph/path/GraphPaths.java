@@ -1,5 +1,6 @@
 package org.example.j_graph.path;
 
+import lombok.experimental.UtilityClass;
 import org.example.j_graph.Edge;
 import org.example.j_graph.Graph;
 import org.example.j_graph.Vertex;
@@ -12,9 +13,8 @@ import java.util.Objects;
 /**
  * Utility class for reconstructing paths from a graph traversal discovery forest.
  */
-public final class GraphPaths {
-    private GraphPaths() {
-    }
+@UtilityClass
+public class GraphPaths {
 
     /**
      * Reconstructs the path from {@code start} to {@code end} using the given discovery forest.
