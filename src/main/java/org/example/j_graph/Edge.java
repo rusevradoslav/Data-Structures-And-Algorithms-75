@@ -2,6 +2,7 @@ package org.example.j_graph;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import lombok.Getter;
 
 /**
  * Represents an edge in a {@link Graph}.
@@ -17,6 +18,7 @@ import java.util.Arrays;
  */
 public class Edge<V, E> {
 
+    @Getter
     private final E element;
 
     private final Vertex<V, E>[] endpoints;
@@ -32,15 +34,6 @@ public class Edge<V, E> {
     public Edge(Vertex<V, E> origin, Vertex<V, E> destination, E element) {
         this.endpoints = new Vertex[]{origin, destination};
         this.element = element;
-    }
-
-    /**
-     * Returns the element stored on this edge.
-     *
-     * @return the edge element
-     */
-    public E getElement() {
-        return this.element;
     }
 
     /**
