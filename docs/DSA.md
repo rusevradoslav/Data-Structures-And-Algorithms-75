@@ -25,6 +25,12 @@
     - [DFS vs BFS](#dfs-vs-bfs)
     - [Path Reconstruction](#path-reconstruction)
     - [Transitive Closure](#transitive-closure)
+    - [Topological Sort](#topological-sort)
+      - [DFS Recursive Approach](#dfs-recursive-approach)
+      - [DFS Iterative Approach](#dfs-iterative-approach)
+      - [Recursive vs Iterative DFS](#recursive-vs-iterative-dfs)
+      - [Kahn's Algorithm](#kahns-algorithm)
+      - [DFS vs Kahn's](#dfs-vs-kahns)
 - [Heaps & Priority Queues](#heaps--priority-queues)
 - [Binary Search](#binary-search)
 - [Dynamic Programming](#dynamic-programming)
@@ -1679,6 +1685,266 @@ Three nested loops, each iterating over all n vertices. The body of the innermos
 | Best for | Sparse graphs | Dense graphs |
 
 For most real-world (sparse) graphs the DFS approach is preferable. Floyd-Warshall earns its place because the relaxation pattern ("if going through k helps, update the answer") generalizes to other algorithms like all-pairs shortest paths.
+
+---
+
+### Topological Sort
+
+**Definition**
+
+A topological sort of a directed acyclic graph (DAG) is a linear ordering of all vertices such that for every directed edge u → v, u appears before v in the ordering. It answers the question: "in what order can we process these tasks so that every dependency is satisfied before the task that depends on it?"
+
+A topological ordering exists if and only if the graph is a DAG — any cycle makes it impossible (a cycle implies A must come before B, B before C, and C before A simultaneously).
+
+**Key properties**
+
+| Property | Detail |
+|---|---|
+| Requires | Directed acyclic graph (DAG) |
+| Result | Linear ordering of all vertices |
+| Uniqueness | Not unique — multiple valid orderings may exist |
+| Cycle | Detected as a side-effect of the DFS-based approach |
+
+**Use cases**
+
+- Build systems and package managers (compile dependencies before dependents)
+- Course scheduling (prerequisites before the courses that require them)
+- Task scheduling in workflow engines
+- Spreadsheet formula evaluation order
+
+---
+
+#### DFS Recursive Approach
+
+Strategy: run a post-order DFS. A vertex is added to the result only after all vertices reachable from it have been processed. Reversing the post-order list yields topological order.
+
+**Algorithm**
+
+```java
+public List<Vertex<V, E>> sort(Graph<V, E> graph) {
+    Set<Vertex<V, E>> done = new HashSet<>();
+    Set<Vertex<V, E>> inProgress = new HashSet<>();
+    List<Vertex<V, E>> result = new ArrayList<>();
+
+    for (Vertex<V, E> vertex : graph.getVertices()) {
+        if (!done.contains(vertex)) {
+            dfs(vertex, done, inProgress, result);
+        }
+    }
+
+    Collections.reverse(result);
+    return result;
+}
+
+private void dfs(Vertex<V, E> vertex, Set<Vertex<V, E>> done,
+                 Set<Vertex<V, E>> inProgress, List<Vertex<V, E>> result) {
+    inProgress.add(vertex);
+    for (Vertex<V, E> neighbour : vertex.getOutgoing().keySet()) {
+        if (inProgress.contains(neighbour)) {
+            throw new IllegalStateException("Cycle detected");
+        }
+        if (!done.contains(neighbour)) {
+            dfs(neighbour, done, inProgress, result);
+        }
+    }
+    inProgress.remove(vertex);
+    done.add(vertex);
+    result.add(vertex);
+}
+```
+
+**Three-colour model**
+
+Each vertex is in exactly one of three states at any point:
+
+| Colour | Set | Meaning |
+|---|---|---|
+| White | neither | Not yet visited |
+| Grey | `inProgress` | On the current DFS path — descendants not yet finished |
+| Black | `done` | Fully processed — all descendants committed |
+
+A back edge (grey → grey) indicates a cycle. A cross or forward edge (grey → black) is safely skipped.
+
+**Walk-through on A → B → C → D, A → C**
+
+| Step | Action | inProgress | done | result (pre-reverse) |
+|---|---|---|---|---|
+| 1 | Visit A | {A} | {} | [] |
+| 2 | Visit B | {A,B} | {} | [] |
+| 3 | Visit C (via B) | {A,B,C} | {} | [] |
+| 4 | Visit D | {A,B,C,D} | {} | [] |
+| 5 | D done | {A,B,C} | {D} | [D] |
+| 6 | C done | {A,B} | {D,C} | [D,C] |
+| 7 | B done | {A} | {D,C,B} | [D,C,B] |
+| 8 | A's edge A→C: C already in done — skip | | | |
+| 9 | A done | {} | {D,C,B,A} | [D,C,B,A] |
+| 10 | Reverse | | | [A,B,C,D] |
+
+**Properties**
+
+| Property | Value |
+|---|---|
+| Time complexity | O(V + E) |
+| Space complexity | O(V) — `done`, `inProgress`, result, call stack |
+| Cycle detection | Yes — back edge throws `IllegalStateException` |
+| Limitation | Call stack depth O(V); risk of `StackOverflowError` on a long chain |
+
+---
+
+#### DFS Iterative Approach
+
+Strategy: identical post-order logic but replaces the call stack with an explicit `Deque`. Each vertex is pushed twice — once as a "first visit" frame (push children) and once as a "second visit" frame (commit to result). The two-visit pattern replicates the pre/post-order behaviour of recursion.
+
+**Algorithm**
+
+```java
+public List<Vertex<V, E>> sort(Graph<V, E> graph) {
+    Set<Vertex<V, E>> done = new HashSet<>();
+    Set<Vertex<V, E>> inProgress = new HashSet<>();
+    List<Vertex<V, E>> result = new ArrayList<>();
+    Deque<Frame<V, E>> stack = new ArrayDeque<>();
+
+    for (Vertex<V, E> vertex : graph.getVertices()) {
+        if (!done.contains(vertex)) {
+            stack.push(new Frame<>(vertex, false));
+            while (!stack.isEmpty()) {
+                Frame<V, E> frame = stack.pop();
+                Vertex<V, E> frameVertex = frame.vertex();
+                if (!frame.secondVisit()) {
+                    inProgress.add(frameVertex);
+                    stack.push(new Frame<>(frameVertex, true));
+                    for (Vertex<V, E> neighbour : frameVertex.getOutgoing().keySet()) {
+                        if (inProgress.contains(neighbour)) {
+                            throw new IllegalStateException("Cycle detected");
+                        }
+                        if (!done.contains(neighbour)) {
+                            stack.push(new Frame<>(neighbour, false));
+                        }
+                    }
+                } else {
+                    inProgress.remove(frameVertex);
+                    done.add(frameVertex);
+                    result.add(frameVertex);
+                }
+            }
+        }
+    }
+
+    Collections.reverse(result);
+    return result;
+}
+
+private record Frame<V, E>(Vertex<V, E> vertex, boolean secondVisit) {}
+```
+
+**Push order is critical**
+
+On a first visit, `Frame(vertex, true)` is pushed before the children. Because `push` is `addFirst`, children land on top and are processed first. The second-visit frame sits below, waiting until all descendants are done — exactly mirroring the recursive call stack.
+
+Pushing the second-visit frame after the children would place it on top, causing the parent to be committed before its subtree is processed.
+
+**Properties**
+
+| Property | Value |
+|---|---|
+| Time complexity | O(V + E) |
+| Space complexity | O(V) — `done`, `inProgress`, result, explicit stack |
+| Cycle detection | Yes — back edge throws `IllegalStateException` |
+| Advantage over recursive | No risk of `StackOverflowError` on deep graphs |
+
+---
+
+#### Recursive vs Iterative DFS
+
+| Aspect | Recursive | Iterative |
+|---|---|---|
+| Call stack depth | O(V) — risk of `StackOverflowError` | O(V) — explicit `Deque`, no JVM limit |
+| Code complexity | Simple — post-order is implicit | Requires two-visit frame pattern |
+| Cycle detection | Same back-edge check | Same back-edge check |
+| Result correctness | Identical | Identical |
+
+Prefer the iterative version when operating on graphs with potentially long chains (deep dependency trees, linear workflows). The recursive version is simpler to read and sufficient for bounded-depth graphs.
+
+---
+
+#### Kahn's Algorithm
+
+Strategy: BFS-based. Repeatedly pick a vertex with no remaining incoming dependencies, emit it, and remove its contribution to its neighbors' in-degrees. Vertices are added to the result in topological order directly — no reversal needed.
+
+**Algorithm**
+
+```java
+public List<Vertex<V, E>> sort(Graph<V, E> graph) {
+    Map<Vertex<V, E>, Integer> inDegree = new HashMap<>();
+    Deque<Vertex<V, E>> queue = new ArrayDeque<>();
+
+    for (Vertex<V, E> vertex : graph.getVertices()) {
+        int degree = vertex.getIncoming().size();
+        inDegree.put(vertex, degree);
+        if (degree == 0) {
+            queue.offer(vertex);
+        }
+    }
+
+    List<Vertex<V, E>> result = new ArrayList<>();
+    while (!queue.isEmpty()) {
+        Vertex<V, E> vertex = queue.poll();
+        result.add(vertex);
+        for (Vertex<V, E> neighbour : vertex.getOutgoing().keySet()) {
+            int updated = inDegree.get(neighbour) - 1;
+            inDegree.put(neighbour, updated);
+            if (updated == 0) {
+                queue.offer(neighbour);
+            }
+        }
+    }
+
+    if (result.size() != inDegree.size()) {
+        throw new IllegalStateException("Cycle detected");
+    }
+    return result;
+}
+```
+
+**Walk-through on A → B → D, A → C → D**
+
+| Step | Queue | Action | in-degree map (changes only) | result |
+|---|---|---|---|---|
+| Init | [A] | A has in-degree 0 | A=0, B=1, C=1, D=2 | [] |
+| 1 | [B, C] | Dequeue A; decrement B→0, C→0; enqueue both | B=0, C=0 | [A] |
+| 2 | [C, D] | Dequeue B; decrement D→1 | D=1 | [A, B] |
+| 3 | [D] | Dequeue C; decrement D→0; enqueue D | D=0 | [A, B, C] |
+| 4 | [] | Dequeue D; no outgoing | — | [A, B, C, D] |
+
+result.size() (4) == inDegree.size() (4) → no cycle.
+
+**Cycle detection — passive**
+
+Vertices in a cycle never reach in-degree 0 — they're waiting on each other. They are never enqueued, so the result ends up smaller than the total vertex count. The size check at the end catches this. Unlike DFS, the cycle is not detected mid-traversal — the algorithm runs to completion first.
+
+**Properties**
+
+| Property | Value |
+|---|---|
+| Time complexity | O(V + E) |
+| Space complexity | O(V) — in-degree map, queue, result |
+| Cycle detection | Passive — size check after BFS completes |
+| Reversal needed | No — result is in topological order directly |
+
+---
+
+#### DFS vs Kahn's
+
+| Aspect | DFS (recursive or iterative) | Kahn's |
+|---|---|---|
+| Strategy | Post-order DFS + reverse | BFS from in-degree-0 vertices |
+| Cycle detection | Active — throws immediately on back edge | Passive — detected at end via size check |
+| Reversal | Required | Not required |
+| Order produced | Reverse post-order | BFS-level order (sources first, naturally) |
+| Stack overflow risk | Yes (recursive only) | No |
+| Intuition | Follow paths to their end, then commit | Peel off dependency-free vertices layer by layer |
+
+Kahn's is often preferred when you need the result in a natural "dependency-first" order or when you want to process vertices as they become available (streaming). DFS is preferred when cycle detection needs to fail fast rather than after a full traversal.
 
 ---
 
