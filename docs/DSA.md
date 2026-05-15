@@ -34,6 +34,8 @@
   - [Shortest Paths](#shortest-paths)
     - [Dijkstra's Algorithm](#dijkstras-algorithm)
     - [BFS vs Dijkstra's](#bfs-vs-dijkstras)
+  - [Minimum Spanning Tree](#minimum-spanning-tree)
+    - [Prim's Algorithm](#prims-algorithm)
 - [Heaps & Priority Queues](#heaps--priority-queues)
 - [Binary Search](#binary-search)
 - [Dynamic Programming](#dynamic-programming)
@@ -2067,6 +2069,120 @@ Each edge triggers at most one priority queue insertion: O(E log V). Each vertex
 | Shortest path guarantee | Yes (by hop count) | Yes (by weight sum) |
 
 BFS is a special case of Dijkstra's where every edge has weight 1. When all edges are uniform, the FIFO queue naturally processes vertices in distance order, making the priority queue unnecessary.
+
+---
+
+### Minimum Spanning Tree
+
+**Definition**
+
+A minimum spanning tree (MST) of a connected, undirected, weighted graph is a spanning tree — a subgraph that includes every vertex and is acyclic — whose total edge weight is minimal among all possible spanning trees. For n vertices the MST always has exactly n-1 edges.
+
+**Key properties**
+
+| Property | Detail |
+|---|---|
+| Requires | Connected, undirected graph with weighted edges |
+| Result | A set of n-1 edges spanning all vertices with minimum total weight |
+| Uniqueness | Unique when all edge weights are distinct; multiple MSTs possible with ties |
+| Cycles | An MST is acyclic by definition — adding any edge to it creates exactly one cycle |
+
+**Use cases**
+
+- Network design: minimum cable to connect all buildings, minimum pipe to connect all cities.
+- Cluster analysis: remove the heaviest MST edges to split a graph into k components.
+- Approximation algorithms: MSTs serve as the backbone for the traveling salesman approximation.
+
+---
+
+#### Prim's Algorithm
+
+**Strategy**
+
+Greedy. Grow the tree one edge at a time, always picking the cheapest edge that connects a vertex already in the tree to one that is not. A priority queue ordered by edge weight drives the selection. Continue until all vertices are in the tree (or the queue is exhausted for disconnected graphs).
+
+**Algorithm**
+
+```java
+public List<Edge<V, Integer>> mst(Graph<V, Integer> graph) {
+    Iterable<Vertex<V, Integer>> vertices = graph.getVertices();
+    Iterator<Vertex<V, Integer>> iterator = vertices.iterator();
+
+    List<Edge<V, Integer>> result = new ArrayList<>();
+    if (!iterator.hasNext()) {
+        return result;
+    }
+
+    Set<Vertex<V, Integer>> inTree = new HashSet<>();
+    PriorityQueue<Edge<V, Integer>> queue =
+            new PriorityQueue<>(Comparator.comparing(Edge::getElement));
+
+    Vertex<V, Integer> start = iterator.next();
+    inTree.add(start);
+    for (Edge<V, Integer> edge : graph.getOutgoingEdges(start)) {
+        queue.add(edge);
+    }
+
+    while (!queue.isEmpty() && inTree.size() < graph.numVertices()) {
+        Edge<V, Integer> edge = queue.poll();
+        Vertex<V, Integer> origin = edge.getEndpoints()[0];
+        Vertex<V, Integer> destination = edge.getEndpoints()[1];
+
+        if (inTree.contains(origin) && inTree.contains(destination)) {
+            continue;
+        }
+        Vertex<V, Integer> next = inTree.contains(origin) ? destination : origin;
+
+        result.add(edge);
+        inTree.add(next);
+        for (Edge<V, Integer> outgoing : graph.getOutgoingEdges(next)) {
+            if (!inTree.contains(graph.opposite(next, outgoing))) {
+                queue.add(outgoing);
+            }
+        }
+    }
+    return result;
+}
+```
+
+**Walk-through**
+
+Graph:
+
+```
+A --1-- B
+|       |
+4       2
+|       |
+C --3-- D
+```
+
+| Step | Polled edge | inTree | Action |
+|---|---|---|---|
+| Init | — | {A} | Enqueue A-B(1), A-C(4) |
+| 1 | A-B(1) | {A,B} | Add A-B. Enqueue B-D(2) |
+| 2 | B-D(2) | {A,B,D} | Add B-D. Enqueue D-C(3) |
+| 3 | D-C(3) | {A,B,D,C} | Add D-C. All vertices in tree — done |
+| 4 | A-C(4, stale) | skipped — both endpoints in tree | |
+
+The stale A-C edge is never added to the result because both its endpoints are already in the tree when it is dequeued.
+
+**Properties**
+
+| Property | Value |
+|---|---|
+| Input requirement | Connected, undirected, weighted graph |
+| Disconnected graph | Spans only the component containing the start vertex |
+| Algorithm type | Greedy |
+
+**Complexity**
+
+| Metric | Value |
+|---|---|
+| Time | O((V + E) log E) |
+| Space | O(V + E) |
+
+Each edge is enqueued at most twice (once from each endpoint): O(E) insertions at O(log E) each. Each dequeue is O(log E). Total: O((V + E) log E). Since E ≤ V², this simplifies to O((V + E) log V).
 
 ---
 
