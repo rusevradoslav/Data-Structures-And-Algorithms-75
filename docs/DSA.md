@@ -31,6 +31,9 @@
       - [Recursive vs Iterative DFS](#recursive-vs-iterative-dfs)
       - [Kahn's Algorithm](#kahns-algorithm)
       - [DFS vs Kahn's](#dfs-vs-kahns)
+  - [Shortest Paths](#shortest-paths)
+    - [Dijkstra's Algorithm](#dijkstras-algorithm)
+    - [BFS vs Dijkstra's](#bfs-vs-dijkstras)
 - [Heaps & Priority Queues](#heaps--priority-queues)
 - [Binary Search](#binary-search)
 - [Dynamic Programming](#dynamic-programming)
@@ -1945,6 +1948,125 @@ Vertices in a cycle never reach in-degree 0 — they're waiting on each other. T
 | Intuition | Follow paths to their end, then commit | Peel off dependency-free vertices layer by layer |
 
 Kahn's is often preferred when you need the result in a natural "dependency-first" order or when you want to process vertices as they become available (streaming). DFS is preferred when cycle detection needs to fail fast rather than after a full traversal.
+
+---
+
+### Shortest Paths
+
+**Definition**
+
+The shortest path between two vertices is the path with the minimum total edge weight. For unweighted graphs, weight is implicitly 1 per hop, and BFS finds the shortest path directly. For weighted graphs with non-negative weights, Dijkstra's algorithm is the standard approach.
+
+---
+
+#### Dijkstra's Algorithm
+
+**Strategy**
+
+Greedy. Maintain a tentative distance from the source to every vertex, initialized to ∞. Repeatedly extract the vertex with the smallest known distance, mark it final, and relax its outgoing edges — updating any neighbor whose new distance would be shorter. A vertex marked final is never reconsidered.
+
+**Correctness assumption: non-negative edge weights**
+
+The greedy step is only safe because distances can never decrease once a vertex is finalized. With a negative edge, a path discovered later through that edge could undercut a distance already marked final — Dijkstra's would miss it. For graphs with negative weights, use Bellman-Ford instead.
+
+**Algorithm**
+
+```java
+public Map<Vertex<V, Integer>, Integer> distances(Graph<V, Integer> graph, Vertex<V, Integer> start) {
+    Map<Vertex<V, Integer>, Integer> distances = new HashMap<>();
+    Set<Vertex<V, Integer>> visited = new HashSet<>();
+    PriorityQueue<VertexDistance<V>> queue =
+            new PriorityQueue<>(Comparator.comparing(VertexDistance::distance));
+
+    distances.put(start, 0);
+    queue.offer(new VertexDistance<>(start, 0));
+
+    while (!queue.isEmpty()) {
+        Vertex<V, Integer> current = queue.poll().vertex();
+        if (visited.contains(current)) {
+            continue;
+        }
+        visited.add(current);
+
+        for (Edge<V, Integer> edge : graph.getOutgoingEdges(current)) {
+            int weight = edge.getElement();
+            if (weight < 0) {
+                throw new IllegalArgumentException("Edge weight cannot be negative");
+            }
+            Vertex<V, Integer> neighbour = graph.opposite(current, edge);
+            if (visited.contains(neighbour)) {
+                continue;
+            }
+            int newDist = distances.get(current) + weight;
+            if (newDist < distances.getOrDefault(neighbour, Integer.MAX_VALUE)) {
+                distances.put(neighbour, newDist);
+                queue.offer(new VertexDistance<>(neighbour, newDist));
+            }
+        }
+    }
+    return distances;
+}
+
+private record VertexDistance<V>(Vertex<V, Integer> vertex, int distance) {}
+```
+
+**Lazy deletion pattern**
+
+When a shorter path to a vertex is found, the old entry in the priority queue is not removed — it's cheaper to leave it and skip it on dequeue (the `visited` check). This is the standard approach because Java's `PriorityQueue` does not support O(log n) key-decrease.
+
+**Walk-through**
+
+Graph:
+
+```
+A --1--> B --2--> C
+|                 ^
+`--------5--------'
+```
+
+Direct path A→C costs 5. Two-hop path A→B→C costs 1+2=3.
+
+| Step | Dequeued | visited | distances after relaxation |
+|---|---|---|---|
+| Init | — | {} | {A=0} |
+| 1 | A (dist 0) | {A} | {A=0, B=1, C=5} |
+| 2 | B (dist 1) | {A,B} | {A=0, B=1, C=3} |
+| 3 | C (dist 3) | {A,B,C} | unchanged — done |
+| 4 | C (dist 5, stale) | already visited — skip | |
+
+Step 1: relaxing A sets B=1 and C=5. Step 2: relaxing B finds C at 1+2=3, shorter than 5 — updates distances and enqueues C again. The stale C=5 entry is skipped when dequeued at step 4.
+
+**Properties**
+
+| Property | Value |
+|---|---|
+| Input requirement | Non-negative edge weights |
+| Works on | Directed and undirected graphs |
+| Returns | Shortest distance to every reachable vertex from source |
+| Unreachable vertices | Absent from result map |
+| Algorithm type | Greedy |
+
+**Complexity**
+
+| Metric | Value |
+|---|---|
+| Time | O((V + E) log V) |
+| Space | O(V + E) |
+
+Each edge triggers at most one priority queue insertion: O(E log V). Each vertex is dequeued once (stale entries are skipped in O(log V)): O(V log V). Total: O((V + E) log V). A Fibonacci heap lowers this to O(V log V + E) but Java's `PriorityQueue` is a binary heap.
+
+---
+
+#### BFS vs Dijkstra's
+
+| Aspect | BFS | Dijkstra's |
+|---|---|---|
+| Edge weights | Unweighted (uniform cost 1) | Non-negative integer or real weights |
+| Data structure | Queue (FIFO) | Min-heap (priority queue) |
+| Time | O(V + E) | O((V + E) log V) |
+| Shortest path guarantee | Yes (by hop count) | Yes (by weight sum) |
+
+BFS is a special case of Dijkstra's where every edge has weight 1. When all edges are uniform, the FIFO queue naturally processes vertices in distance order, making the priority queue unnecessary.
 
 ---
 
