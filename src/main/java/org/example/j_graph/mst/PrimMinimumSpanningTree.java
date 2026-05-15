@@ -13,7 +13,35 @@ import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.Set;
 
+/**
+ * Prim's minimum spanning tree algorithm — returns the set of edges forming an MST
+ * of a connected undirected weighted graph.
+ *
+ * <p><b>Approach:</b>
+ * <ul>
+ *   <li>Start from an arbitrary vertex; add all its edges to a min-heap</li>
+ *   <li>Repeatedly poll the cheapest edge from the heap</li>
+ *   <li>Skip edges where both endpoints are already in the tree (cycle prevention)</li>
+ *   <li>Add the new vertex to the tree and enqueue its edges to non-tree vertices</li>
+ *   <li>Stop when all vertices are in the tree or the heap is empty</li>
+ * </ul>
+ *
+ * <p>Example:
+ * <pre>
+ *   A -(1)- B, A -(4)- C, B -(2)- D, C -(3)- D
+ *
+ *   MST: {A-B(1), B-D(2), C-D(3)}   total weight 6   (A-C(4) excluded — creates a cycle)
+ * </pre>
+ *
+ * <p>Time Complexity: O((V + E) log E) — each edge is enqueued at most twice.
+ *
+ * <p>Space Complexity: O(V + E) — inTree set, priority queue, and result list.
+ *
+ * @param <V> the type of element stored in vertices
+ */
 public class PrimMinimumSpanningTree<V> implements MinimumSpanningTree<V> {
+
+    /** {@inheritDoc} */
     @Override
     public List<Edge<V, Integer>> mst(Graph<V, Integer> graph) {
         if (Objects.isNull(graph)) {
