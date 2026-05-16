@@ -28,9 +28,19 @@ import java.util.Set;
  *
  * <p>Example:
  * <pre>
- *   A -(1)- B, A -(4)- C, B -(2)- D, C -(3)- D
+ *   A --1-- B
+ *   |       |
+ *   4       2
+ *   |       |
+ *   C --3-- D
  *
- *   MST: {A-B(1), B-D(2), C-D(3)}   total weight 6   (A-C(4) excluded — creates a cycle)
+ *   init  : inTree={A},         heap=[A-B(1), A-C(4)]
+ *   step 1: poll A-B(1), add B, inTree={A,B},     heap=[B-D(2), A-C(4)]
+ *   step 2: poll B-D(2), add D, inTree={A,B,D},   heap=[C-D(3), A-C(4)]
+ *   step 3: poll C-D(3), add C, inTree={A,B,C,D}  all vertices in tree — stop
+ *
+ *   MST: A-B(1), B-D(2), C-D(3)   total weight 6
+ *   A-C(4) never polled — loop exits once all vertices are in the tree
  * </pre>
  *
  * <p>Time Complexity: O((V + E) log E) — each edge is enqueued at most twice.
